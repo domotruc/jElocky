@@ -1,5 +1,10 @@
 {
-	"require" : {
+    "config" : {
+        "preferred-install" : {
+            "*" : "dist"
+        }
+    },
+    "require" : {
 		"domotruc/elocky-api" : "dev-master"
 	}
 }

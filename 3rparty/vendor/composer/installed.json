@@ -6,21 +6,21 @@
         "source": {
             "type": "git",
             "url": "https://github.com/domotruc/elocky-api.git",
-            "reference": "76bf00c1294271bbc169f78621d78cdaa659aa77"
+            "reference": "d3f4a6bc62d380a089d2db926307c7826379f003"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/domotruc/elocky-api/zipball/76bf00c1294271bbc169f78621d78cdaa659aa77",
-            "reference": "76bf00c1294271bbc169f78621d78cdaa659aa77",
+            "url": "https://api.github.com/repos/domotruc/elocky-api/zipball/d3f4a6bc62d380a089d2db926307c7826379f003",
+            "reference": "d3f4a6bc62d380a089d2db926307c7826379f003",
             "shasum": ""
         },
         "require": {
             "php": ">=5.4.0",
             "psr/log": "^1.0.0"
         },
-        "time": "2018-10-27T17:07:04+00:00",
+        "time": "2018-12-11T06:52:11+00:00",
         "type": "library",
-        "installation-source": "source",
+        "installation-source": "dist",
         "autoload": {
             "psr-4": {
                 "ElockyAPI\\": "src/"
@@ -44,23 +44,23 @@
     },
     {
         "name": "psr/log",
-        "version": "1.0.2",
-        "version_normalized": "1.0.2.0",
+        "version": "1.1.0",
+        "version_normalized": "1.1.0.0",
         "source": {
             "type": "git",
             "url": "https://github.com/php-fig/log.git",
-            "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d"
+            "reference": "6c001f1daafa3a3ac1d8ff69ee4db8e799a654dd"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/php-fig/log/zipball/4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
-            "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
+            "url": "https://api.github.com/repos/php-fig/log/zipball/6c001f1daafa3a3ac1d8ff69ee4db8e799a654dd",
+            "reference": "6c001f1daafa3a3ac1d8ff69ee4db8e799a654dd",
             "shasum": ""
         },
         "require": {
             "php": ">=5.3.0"
         },
-        "time": "2016-10-10T12:19:37+00:00",
+        "time": "2018-11-20T15:27:04+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
