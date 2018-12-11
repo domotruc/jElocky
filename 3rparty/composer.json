@@ -1,0 +1,5 @@
+{
+	"require" : {
+		"domotruc/elocky-api" : "dev-master"
+	}
+}

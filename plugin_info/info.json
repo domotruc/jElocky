@@ -1,0 +1,19 @@
+{
+	"id" : "jElocky",
+	"name" : "jElocky",
+	"description" : "Plugin de gestion des serrures connectées elocky",
+	"licence" : "AGPL",
+	"author" : "domotruc",
+	"require" : "3.2",
+	"category" : "security",
+	"hasDependency" : false,
+	"hasOwnDeamon" : false,
+	"maxDependancyInstallTime" : 0,
+	"changelog" : "https://jeedom.github.io/plugin-template/#language#/changelog",
+	"documentation" : "https://jeedom.github.io/plugin-template/#language#/",
+	"link" : {
+		"forum":"Lien vers le forum"
+	},
+	"language" : ["fr_FR","en_US","de_DE","sp_SP"],
+	"compatibility" : ["miniplus","smart","rpi","docker","diy","mobile"]
+}
