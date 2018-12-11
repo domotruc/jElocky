@@ -1,2 +1,2 @@
 # jElocky
-Jeedom plugin for the elockey door lock
+Jeedom plugin for the [Elocky](https://elocky.com) door lock.

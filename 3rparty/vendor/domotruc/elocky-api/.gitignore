@@ -1,0 +1,6 @@
+.project
+.buildpath
+credential.php
+vendor/
+data/
+composer.lock
