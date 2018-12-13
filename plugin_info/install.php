@@ -1,6 +1,7 @@
 <?php
 
-/* This file is part of Jeedom.
+/*
+ * This file is part of Jeedom.
  *
  * Jeedom is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,28 +16,61 @@
  * You should have received a copy of the GNU General Public License
  * along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
  */
-
 require_once __DIR__ . '/../../../core/php/core.inc.php';
+
+require_once __DIR__ . '/../core/class/jElockyLog.class.php';
 require_once __DIR__ . '/../core/class/jElockyUtil.class.php';
 
-function patch_core() {
-    exec('patch -r - -N -b -i ' . __DIR__ . '/plugin.template.js.diff ' . __DIR__ . '/../core/plugin.template.js');
-}
 
-function jElocky_install() {
-    patch_core();
-    
-    // Creation of the data directory
-    if (!file_exists(jElockyUtil::DATA_DIR)) {
-        exec('mkdir ' . jElockyUtil::DATA_DIR . ' && chmod 775 -R ' . jElockyUtil::DATA_DIR . ' && chown -R www-data:www-data ' . jElockyUtil::DATA_DIR);
+/**
+ * Patch plugin.template.js if required (core version < 3.3.7)
+ */
+function jElocky_patch_core() {
+    $ver = jeedom::version();
+    if (version_compare($ver, '3.3.7', '<')) {
+        jElockyLog::add('info', 'le core ' . $ver . ' va être patché pour que le plugin jElocky fonctionne');
+        $f = __DIR__ . '/../../../core/js/plugin.template.js';
+        exec('patch -r - -N -b -i ' . __DIR__ . '/plugin.template.js.diff ' . $f);
+        passthru('grep -q "prePrintEqLogic(\$(this).attr(\'data-eqLogic_id\'));" ' . $f, $err);
+        if ($err == 0)
+            jElockyLog::add('info', 'patch du core correctement effectué');
+        else
+            jElockyLog::add('error', 'patch du core non effectué: le plugin ne fonctionnera pas');
     }
+    else
+        jElockyLog::add('debug', 'core version >= 3.3.7: no need for patch');
+    
+    log::add('plugin', 'debug', 'End ' . __METHOD__);
 }
 
+/**
+ * Called on plugin activation
+ */
+function jElocky_install() {
+    jElockyLog::startStep(__METHOD__);
+    
+    // Patch the core if needed
+    jElocky_patch_core();
+
+    // Creation of the data directory
+    if (! file_exists(jElockyUtil::DATA_DIR)) {
+        jElockyLog::add('info', 'création du répertoire ' . jElockyUtil::DATA_DIR);
+        exec(
+            'mkdir -p ' . jElockyUtil::DATA_DIR . ' && chmod 775 -R ' . jElockyUtil::DATA_DIR .
+            ' && chown -R www-data:www-data ' . jElockyUtil::DATA_DIR);
+    }
+    jElockyLog::endStep();
+}
+
+/**
+ * Called on plugin reactivation after reinstallation or update
+ */
 function jElocky_update() {
-    patch_core();
+    jElockyLog::startStep(__METHOD__);
+    jElocky_patch_core();
+    jElockyLog::endStep();
 }
 
-function jElocky_remove() {
-}
+function jElocky_remove() {}
 
-?>
+

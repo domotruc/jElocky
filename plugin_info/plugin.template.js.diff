@@ -1,0 +1,11 @@
+--- plugin.template.js	2018-12-03 22:11:16.006067419 +0100
++++ plugin.template.js	2018-10-02 20:55:33.552904013 +0200
+@@ -85,7 +85,7 @@
+ 
+     $('.eqLogic').hide();
+     if ('function' == typeof (prePrintEqLogic)) {
+-        prePrintEqLogic();
++        prePrintEqLogic($(this).attr('data-eqLogic_id'));
+     }
+ 
+     if (isset($(this).attr('data-eqLogic_type')) && isset($('.' + $(this).attr('data-eqLogic_type')))) {

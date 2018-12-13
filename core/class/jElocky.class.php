@@ -20,6 +20,7 @@
 require_once __DIR__ . '/../../../../core/php/core.inc.php';
 require_once __DIR__ . '/../../3rparty/vendor/autoload.php';
 //require_once __DIR__ . '/jElockyUtil.class.php';  // required for desktop/php/jElocky.php
+require_once __DIR__ . '/jElockyLog.class.php';
 require_once __DIR__ . '/jElocky_user.class.php';
 require_once __DIR__ . '/jElocky_place.class.php';
 
