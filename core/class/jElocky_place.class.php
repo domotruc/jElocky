@@ -244,13 +244,13 @@ class jElocky_place extends eqLogic {
     }
     
     /**
-     * Request data from the Elocky server and update this place information
-     * This place shall be saved after calling this method
+     * Request data from the Elocky server and update this place information.
+     * This place shall be saved after calling this method.
      * @param bool $cmd_only whether or not only commands shall be updated
      * @throws \Exception in case of connexion error with the Elocky server
      */
     private function requestDataAndUpdate($cmd_only) {
-        jElockyLog::add('info', 'updating' . ($cmd_only ? ' ' : 'data and ') . 'commands of place ' . $this->getName());
+        jElockyLog::add('info', 'updating ' . ($cmd_only ? ' ' : 'data and ') . 'commands of place ' . $this->getName());
         if (($admin = $this->getAdmin()) != null) {
             try {
                 $place = $admin->requestPlaces($this->getLogicalId());

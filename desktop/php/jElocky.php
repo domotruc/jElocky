@@ -8,6 +8,7 @@ sendVarToJS('eqType', jElocky::class);
 sendVarToJS('DATA_DIR', jElockyUtil::getRelativeDataDir());
 $eqUsers = eqLogic::byType('jElocky_user');
 $eqPlaces = eqLogic::byType('jElocky_place');
+$eqObjects = eqLogic::byType('jElocky_object');
 
 function displayActionCard($_action_name, $_action, $_eqLogic_type, $_fa_icon, $_card_color) {
     $eqLogic_type = isset($_eqLogic_type) ? ' data-eqLogic_type="' . $_eqLogic_type . '"' : '';
@@ -54,17 +55,25 @@ function displayEqLogicCard($_eqLogic) {
                  $opacity = ($eqLogic->getIsEnable ()) ? '' : jeedom::getConfiguration ( 'eqLogic:style:noactive' );
                  echo '<li class="cursor li_eqLogic" data-eqLogic_id="' . $eqLogic->getId () . '" data-eqLogic_type="jElocky" style="' . $opacity . '"><a>' . $eqLogic->getHumanName ( true ) . '</a></li>';
                  }*/
-                foreach ($eqUsers as $eqUser) {
-                    $opacity = ($eqUser->getIsEnable ()) ? '' : jeedom::getConfiguration ( 'eqLogic:style:noactive' );
-                    echo '<li class="cursor li_eqLogic" data-eqLogic_id="' . $eqUser->getId () . '" data-eqLogic_type="jElocky_user" style="' . $opacity . '"><a>' . $eqUser->getHumanName ( true ) . '</a></li>';
+                foreach ($eqUsers as $eqL) {
+                    $opacity = ($eqL->getIsEnable ()) ? '' : jeedom::getConfiguration ( 'eqLogic:style:noactive' );
+                    echo '<li class="cursor li_eqLogic" data-eqLogic_id="' . $eqL->getId () . '" data-eqLogic_type="jElocky_user" style="' . $opacity . '"><a>' . $eqL->getHumanName ( true ) . '</a></li>';
                 }
                 ?>
                 </ul></li>
                 <li><i class="fa fa-home"></i><span>  {{Lieux}}</span><ul class="nav nav-list bs-sidenav sub-nav-list">
                 <?php
-                foreach ($eqPlaces as $eqPlace) {
-                    $opacity = ($eqPlace->getIsEnable ()) ? '' : jeedom::getConfiguration ( 'eqLogic:style:noactive' );
-                    echo '<li class="cursor li_eqLogic" data-eqLogic_id="' . $eqPlace->getId () . '" data-eqLogic_type="jElocky_place" style="' . $opacity . '"><a>' . $eqPlace->getHumanName ( true ) . '</a></li>';
+                foreach ($eqPlaces as $eqL) {
+                    $opacity = ($eqL->getIsEnable ()) ? '' : jeedom::getConfiguration ( 'eqLogic:style:noactive' );
+                    echo '<li class="cursor li_eqLogic" data-eqLogic_id="' . $eqL->getId () . '" data-eqLogic_type="jElocky_place" style="' . $opacity . '"><a>' . $eqL->getHumanName ( true ) . '</a></li>';
+                }                
+                ?>
+                </ul></li>
+                <li><i class="fa fa-key"></i><span>  {{Objets}}</span><ul class="nav nav-list bs-sidenav sub-nav-list">
+                <?php
+                foreach ($eqObjects as $eqL) {
+                    $opacity = ($eqL->getIsEnable ()) ? '' : jeedom::getConfiguration ( 'eqLogic:style:noactive' );
+                    echo '<li class="cursor li_eqLogic" data-eqLogic_id="' . $eqL->getId () . '" data-eqLogic_type="jElocky_object" style="' . $opacity . '"><a>' . $eqL->getHumanName ( true ) . '</a></li>';
                 }                
                 ?>
                 </ul></li>
@@ -84,8 +93,8 @@ function displayEqLogicCard($_eqLogic) {
         <ul class="nav nav-tabs" role="tablist">
             <?php
             $active = ' class="active"';
-            foreach ($eqUsers as $eqUser) {
-                echo '<li role="presentation"' . $active  . '><a href="#' . $eqUser->getId() . '" aria-controls="home" role="tab" data-toggle="tab"><i class="fa fa-male"></i> ' . $eqUser->getName() . '</a></li>';
+            foreach ($eqUsers as $eqL) {
+                echo '<li role="presentation"' . $active  . '><a href="#' . $eqL->getId() . '" aria-controls="home" role="tab" data-toggle="tab"><i class="fa fa-male"></i> ' . $eqL->getName() . '</a></li>';
                 $active = '';
             }
             ?>
@@ -94,21 +103,32 @@ function displayEqLogicCard($_eqLogic) {
         <div class="tab-content">
             <?php
             $active = ' in active';
-            foreach ($eqUsers as $eqUser) {
-                echo '<div id="' . $eqUser->getId() . '" class="tab-pane fade' . $active . '">';
-                displayEqLogicCard($eqUser);
+            foreach ($eqUsers as $eqL) {
+                echo '<div id="' . $eqL->getId() . '" class="tab-pane fade' . $active . '">';
+                displayEqLogicCard($eqL);
                 $active = '';
-                       	       
-                $eqPlaces = $eqUser->getPlaces();
-                if (count($eqPlaces) > 0)
+
+                $eqPlaces = $eqL->getPlaces();
+                if (count($eqPlaces) > 0) {
                     echo '<legend><i class="fa fa-home"></i>  {{Lieux}}</legend>';
-        	       foreach ($eqPlaces as $eqPlace) {
-        	           displayEqLogicCard($eqPlace);
-        	       }
-        	       echo '</div>';
+                }
+                foreach ($eqPlaces as $eqL) {
+                    displayEqLogicCard($eqL);
+                }
+                echo '</div>';
             }
             ?>
         </div>
+
+        <legend><i class="fa fa-key"></i>  {{Objets}}</legend>
+        <div class="eqLogicThumbnailContainer">
+            <?php
+            foreach ($eqObjects as $eqL) {
+                displayEqLogicCard($eqL);
+            }
+            ?>
+        </div>
+
 
         <!-- 
         <div class="cursor eqLogicAction" data-action="add" data-eqLogic_type="jElocky_user" style="text-align:center;background-color:#ffffff;height:150px;margin-bottom:10px;padding:5px;border-radius:2px;width:160px;margin-left:10px;" >
@@ -150,6 +170,7 @@ function displayEqLogicCard($_eqLogic) {
 
     <?php include_file('desktop', 'jElocky_user', 'php', 'jElocky'); ?>
     <?php include_file('desktop', 'jElocky_place', 'php', 'jElocky'); ?>
+    <?php include_file('desktop', 'jElocky_object', 'php', 'jElocky'); ?>
 </div>
 
 <?php include_file('desktop', 'jElocky', 'js', 'jElocky');?>

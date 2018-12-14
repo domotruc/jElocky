@@ -41,7 +41,6 @@ trait jElockyEqLogic {
         return 'index.php?v=d&p=jElocky&m=jElocky&id=' . $this->getId();
     }
     
-    
     /**
      * Override the getImage method
      * @return string

@@ -85,9 +85,12 @@
                     <div class="form-group" style="display:none;">
                         <input class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="photo" placeholder="photo" readonly/>
                     </div>
-                    <div class="form-group col-sm-6">
-    												        <img id="photo_place" name="photo" src="core/img/no_image.gif" class="img-responsive center-block" style="max-height:250px;border-radius:20px;"/>
-			                 </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"></label>
+                        <div class="col-sm-3">
+    					   <img id="photo_place" name="photo" src="core/img/no_image.gif" class="img-responsive center-block" style="max-height:250px;border-radius:20px;"/>
+                       </div>
+			        </div>
                 </fieldset>
             </form>
         </div>

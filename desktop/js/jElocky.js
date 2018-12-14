@@ -19,11 +19,12 @@ $(document).ready(function() {
     $('.eqLogicAttr[data-l1key=configuration][data-l2key=photo]').on('change', function () {
         if($(this).value() != '' && $('.li_eqLogic.active').attr('data-eqlogic_id') != '') {
             $('.eqLogic:visible #photo_place,#photo_user').attr("src", DATA_DIR + "/" + $(this).value());
-
-        }/*
-        else{
-            $('#user_photo').attr("src", 'plugins/jElocky/plugin_info/rfxcom_icon.png');
-        }  */
+        }
+    });
+    $('.eqLogicAttr[data-l1key=configuration][data-l2key=type]').on('change', function () {
+        if($(this).value() != '' && $('.li_eqLogic.active').attr('data-eqlogic_id') != '') {
+            $('.eqLogic:visible #photo_object').attr("src", "plugins/jElocky/resources/" + $(this).value() + '.png');
+        }
     });
 });
 

@@ -44,7 +44,9 @@ class jElocky extends eqLogic {
      */
     public static function cron() {
         jElockyLog::startStep(__METHOD__);
-        if (cache::byKey('plugin::cronHourly::last')->getValue() != __CLASS__)
+        // To avoid running cron task if cronHourly is in progress
+        if (cache::byKey('plugin::cronHourly::inprogress')->getValue() == 0 ||
+            cache::byKey('plugin::cronHourly::last')->getValue() != __CLASS__)
             jElocky_place::cronHighFreq();
         jElockyLog::endStep();
     }

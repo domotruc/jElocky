@@ -68,7 +68,7 @@ class jElocky_object extends eqLogic {
     
     /**
      * Create a new object or update it if already existing
-     * Place is not saved
+     * Object is not saved
      * @param array $object object data as returned by https://elocky.com/fr/doc-api-test#liste-objets
      * @param array $place_id jeedom id of the place where is located the object
      * @return jElocky_object
@@ -77,7 +77,7 @@ class jElocky_object extends eqLogic {
         jElockyLog::startStep(__METHOD__);
         
         $type = key_exists('type_board', $object) ? $object['type_board']['id'] : self::TYPE_PASSERELLE;
-        $id = $type == self::TYPE_PASSERELLE ? $object['id'] : $object['reference'];
+        $id = ($type == self::TYPE_PASSERELLE )? $object['id'] : $object['reference'];
         
         /* @var jElocky_place $place_eql*/
         $object_eql = self::byLogicalId($id, self::class);
@@ -89,7 +89,7 @@ class jElocky_object extends eqLogic {
             $object_eql->setEqType_name(__CLASS__);
             $object_eql->setLogicalId($id);
             $object_eql->setIsEnable(1);
-            $object_eql->setConfiguration('type', $type);
+            $object_eql->setConfiguration('type', self::TYPES[$type]);
             $object_eql->setConfiguration('place_id', $place_id);
             
             // Save the place directly: required before creating command
@@ -105,6 +105,14 @@ class jElocky_object extends eqLogic {
         jElockyLog::endStep();
         
         return $object_eql;
+    }
+    
+    /**
+     * Return the photo pathname of this jElocky_object
+     * @return string full filename on the jeedom server
+     */
+    public function getPhoto() {
+        return 'plugins/jElocky/resources/' . $this->getConfiguration('type') . '.png';
     }
     
     /**
