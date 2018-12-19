@@ -52,11 +52,12 @@ trait jElockyEqLogic {
 
     /**
      * @param array[string] $keys
-     * @param array[string] $_values
+     * @param array[string] $values
      */
-    private function setMultipleConfiguration($keys, $_values) {
+    private function setMultipleConfiguration($keys, $values) {
         foreach ($keys as $key) {
-            $this->setConfiguration($key, $_values[$key]);
+            $this->setConfiguration($key, $values[$key]);
+            jElockyLog::add('info', '->' . $this->getName() . '|' . $key . ': ' . json_encode($values[$key]));
         }
     }
        
@@ -75,6 +76,7 @@ trait jElockyEqLogic {
                     $cmd->save();
                 }
                 $cmd->event($data[$key]);
+                jElockyLog::add('info', '->' . $this->getName() . '|' . $cmd->getName() . ' ' . $data[$key]);
             }
             else {
                 jElockyLog::add('warning', 'key "' . $key . '" not found in object ' . $data['name']);

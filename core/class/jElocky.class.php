@@ -57,7 +57,7 @@ class jElocky extends eqLogic {
     public static function cronHourly() {
         jElockyLog::startStep(__METHOD__);
         
-        // Note: perform a full update at user level which update alco places
+        // Note: perform a full update at user level which update also places
         jElocky_user::cronLowFreq();
         
         jElockyLog::endStep();

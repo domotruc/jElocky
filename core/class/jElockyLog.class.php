@@ -77,6 +77,6 @@ class jElockyLog {
         else
             $msgPrefix = '';
         
-        log::add(self::LOG_FILE, $type, $keyPrefix . sprintf('%5d', $key) . ' : ' . $msgPrefix . $msg, $logicalId);
+        log::add(self::LOG_FILE, $type, $keyPrefix . sprintf('%5d', $key) . '|' . $msgPrefix . $msg, $logicalId);
     }
 }

@@ -21,7 +21,7 @@ $(document).ready(function() {
             $('.eqLogic:visible #photo_place,#photo_user').attr("src", DATA_DIR + "/" + $(this).value());
         }
     });
-    $('.eqLogicAttr[data-l1key=configuration][data-l2key=type]').on('change', function () {
+    $('.eqLogicAttr[data-l1key=configuration][data-l2key=type_board]').on('change', function () {
         if($(this).value() != '' && $('.li_eqLogic.active').attr('data-eqlogic_id') != '') {
             $('.eqLogic:visible #photo_object').attr("src", "plugins/jElocky/resources/" + $(this).value() + '.png');
         }

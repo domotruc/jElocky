@@ -34,9 +34,15 @@ class jElocky_object extends eqLogic {
     
     use jElockyEqLogic;
     
-    const TYPE_PASSERELLE = 0;
-    const TYPE_SERRURE = 1;
-    const TYPE_BEACON = 2;
+    // Object type
+    const ID_PASSERELLE = 0;
+    const ID_SERRURE = 1;
+    const ID_BEACON = 2;
+    
+    const KEY_BOARD = 'board';
+    const KEY_PASSERELLE = 'passerelle';
+    const KEY_TYPE_BOARD = 'type_board';
+    const KEY_OBJECT_ID = 'reference';
     
     const TYPES = array('passerelle', 'serrure', 'beacon');
     
@@ -46,7 +52,6 @@ class jElocky_object extends eqLogic {
             'nbObject' => array('id' => 'nbObject', 'stype' => 'numeric'),
             'connectionInternet' => array('id' => 'connectionInternet', 'stype' => 'numeric'),
             'address_ip' => array('id' => 'address_ip', 'stype' => 'string'),
-            'connection' => array('id' => 'connection', 'stype' => 'numeric'),
             'state' => array('id' => 'state', 'stype' => 'numeric'),
             'vpn' => array('id' => 'vpn', 'stype' => 'string'),
             'address_ip_local' => array('id' => 'address_ip_local', 'stype' => 'string')
@@ -67,29 +72,28 @@ class jElocky_object extends eqLogic {
     );
     
     /**
-     * Create a new object or update it if already existing
-     * Object is not saved
+     * Create a new object or return it if already existing.
+     * If created, the object is saved.
      * @param array $object object data as returned by https://elocky.com/fr/doc-api-test#liste-objets
      * @param array $place_id jeedom id of the place where is located the object
      * @return jElocky_object
      */
     public static function getInstance($object, $place_id) {
-        jElockyLog::startStep(__METHOD__);
-        
-        $type = key_exists('type_board', $object) ? $object['type_board']['id'] : self::TYPE_PASSERELLE;
-        $id = ($type == self::TYPE_PASSERELLE )? $object['id'] : $object['reference'];
         
         /* @var jElocky_place $place_eql*/
-        $object_eql = self::byLogicalId($id, self::class);
+        $object_eql = self::byLogicalId($object[self::KEY_OBJECT_ID], self::class);
         
         // Object creation if necessary
-        if (!is_object($object_eql)) {
+        if (is_object($object_eql)) {
+            jElockyLog::add('debug', 'object ' . $object_eql->getName() . ' exists');
+        }
+        else {
             $object_eql = new jElocky_object();
             $object_eql->setName($object['name']);
             $object_eql->setEqType_name(__CLASS__);
-            $object_eql->setLogicalId($id);
+            $object_eql->setLogicalId($object[self::KEY_OBJECT_ID]);
             $object_eql->setIsEnable(1);
-            $object_eql->setConfiguration('type', self::TYPES[$type]);
+            $object_eql->setConfiguration(self::KEY_TYPE_BOARD, self::TYPES[$object[self::KEY_TYPE_BOARD]]);
             $object_eql->setConfiguration('place_id', $place_id);
             
             // Save the place directly: required before creating command
@@ -97,14 +101,27 @@ class jElocky_object extends eqLogic {
                        
             jElockyLog::add('info', 'creating object ' . $object_eql->getName() . ' of type ' . self::TYPES[$type]);
         }
+         
+        return $object_eql;
+    }
+    
+    /**
+     * Update this object information
+     * This place shall be saved after calling this method
+     * @throws \Exception in case of connexion error with the Elocky server
+     */
+    public function update1() {
+        $this->startLogStep(__METHOD__);
         
-        // Place update (configuration and commands)
-        $object_eql->setConfData($object);
-        $object_eql->setCmdData(self::$_cmds_def_matrix[$type], $object);
+        if ($this->getIsEnable()) {
+            /* @var jElocky_place $place_eql*/
+            $place_eql = jElocky_place::byId($this->getConfiguration('place_id'));
+            $object = $place_eql->requestObjects($this->getLogicalId());
+            $this->updateConfiguration($object);
+            $this->updateCommands($object);
+        }
         
         jElockyLog::endStep();
-        
-        return $object_eql;
     }
     
     /**
@@ -112,21 +129,34 @@ class jElocky_object extends eqLogic {
      * @return string full filename on the jeedom server
      */
     public function getPhoto() {
-        return 'plugins/jElocky/resources/' . $this->getConfiguration('type') . '.png';
+        return 'plugins/jElocky/resources/' . $this->getConfiguration(self::KEY_TYPE_BOARD) . '.png';
     }
     
     /**
-     * Update this object configuration parameters with the information retrieved from the Elocky server
-     * Related commands are not updated (see setCmdData)
-     * @param array $object
+     * Update this object configuration parameters with the information retrieved from the Elocky server.
+     * This is the responsability of the caller to save the object.
+     * Related commands are not updated (see updateCommands)
+     * @param array $object object data array retrieved from the Elocky server
      */
-    private function setConfData($object) {
-        $this->setMultipleConfiguration(array('reference'), $object);
-        if ($this->getConfiguration('type') != self::TYPE_PASSERELLE) {
-           $this->setConfiguration('passerelle', key_exists('passerelle') ? $object['passerelle']['id'] : '');
+    public function updateConfiguration($object) {
+        if ($this->getIsEnable()) {
+            $keys = array('reference');
+            if (array_key_exists('id', $object))
+                $keys[] = 'id';            
+            $this->setMultipleConfiguration($keys, $object);
         }
+        //jElockyLog::add('debug', 'place ' . $place_eql->getName() . ' is disabled');
     }
     
+    /**
+     * Update this object commands with the information retrieved from the Elocky server.
+     * @param array $object object data array retrieved from the Elocky server
+     */
+    public function updateCommands($object) {
+        if ($this->getIsEnable()) {
+            $this->setCmdData(self::$_cmds_def_matrix[$object[self::KEY_TYPE_BOARD]], $object);
+        }
+    }    
 }
 
 class jElocky_objectCmd extends cmd {

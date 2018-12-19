@@ -186,13 +186,17 @@ class jElocky_user extends eqLogic implements LoggerInterface {
     public function requestPlaces($place_id=-1) {
         jElockyLog::add('debug', 'requesting ' . ($place_id >= 0 ? 'place ' . $place_id : ' places') .
             ' for user ' . $this->getName());
-        $places = $this->getAPI()->requestPlaces()['lieux'];
-        if ($place_id < 0)
-            return $places;
         
-        foreach ($places as $place) {
-            if ($place['id'] == $place_id)
-                return $place;
+        $api = $this->getAPI();
+        if ($api !== null) {
+            $places = $this->getAPI()->requestPlaces()['lieux'];
+            if ($place_id < 0)
+                return $places;
+                
+            foreach ($places as $place) {
+                if ($place['id'] == $place_id)
+                    return $place;
+            }
         }
         
         return null;

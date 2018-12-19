@@ -60,8 +60,14 @@
                                 type="checkbox" class="eqLogicAttr" data-l1key="isVisible" checked />{{Visible}}</label>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">{{Reference}}</label>
+                        <div class="col-sm-3">
+                            <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="reference" placeholder="reference" readonly/>
+                        </div>
+                    </div> 
                     <div class="form-group" style="display: none;">
-                        <input class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="type"
+                        <input class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="type_board"
                             placeholder="type" readonly />
                     </div>
                     <div class="form-group">
