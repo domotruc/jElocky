@@ -59,6 +59,10 @@ function jElocky_install() {
             'mkdir -p ' . jElockyUtil::DATA_DIR . ' && chmod 775 -R ' . jElockyUtil::DATA_DIR .
             ' && chown -R www-data:www-data ' . jElockyUtil::DATA_DIR);
     }
+    
+    // Create the api key if not already existing
+    jeedom::getApiKey('jElocky');
+    
     jElockyLog::endStep();
 }
 

@@ -159,6 +159,15 @@ class jElocky_place extends eqLogic {
     }
     
     /**
+     * Return objects of this place
+     * @return array[jElocky_object] array of the objects of this place
+     */
+    public function getObjects() {
+        $conf = json_encode(array('place_id' => $this->getId()));
+        return self::byTypeAndSearhConfiguration(jElocky_object::class, substr($conf, 1, -1));
+    }
+    
+    /**
      * Get the administrator of this place
      * @return null|jElocky_user
      */
