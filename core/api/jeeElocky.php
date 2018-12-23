@@ -24,7 +24,7 @@ try {
 
     // log::add('jElocky','debug', 'API::' . file_get_contents("php://input"));
 
-    if (init('test') != '') {
+    if (init('action') == 'test') {
         log::add('jElocky', 'info', 'API::tested ok from ' . getClientIp());
         echo 'OK';
         die();

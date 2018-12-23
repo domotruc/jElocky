@@ -331,7 +331,7 @@ class jElocky_place extends eqLogic {
      */
     private function setAlarmTriggeredCmd($value) {
         $cmd = $this->getCmd(null, jElocky_placeCmd::ALARM_TRIGGERED_ID);
-        if (! is_object($cmd)) {
+        if (is_object($cmd)) {
             if ($this->checkAndUpdateCmd($cmd, $value)) {
                 $cmd->setValue($value);
                 $cmd->save();
