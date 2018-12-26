@@ -7,6 +7,8 @@ $plugin = plugin::byId('jElocky');
 sendVarToJS('eqType', jElocky::class);
 sendVarToJS('DATA_DIR', jElockyUtil::getRelativeDataDir());
 
+jElocky::patch_core();
+
 /* @var array[jElocky_user] $eqUsers */
 $eqUsers = eqLogic::byType('jElocky_user');
 

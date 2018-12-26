@@ -27,7 +27,7 @@ require_once __DIR__ . '/jElocky_place.class.php';
 //use Psr\Log\LogLevel;
 
 class jElocky extends eqLogic {
-
+    
     /* * *************************Attributs****************************** */
 
     /* * ***********************Methode static*************************** */
@@ -63,6 +63,24 @@ class jElocky extends eqLogic {
         jElockyLog::endStep();
     }
 
+    /**
+     * Patch the plugin.template.js core file for core version < 3.3.7
+     * Apply the following patch :
+     * https://github.com/jeedom/core/commit/1031e01d8e987a4871cfc350c3ff660555c239f2#diff-9a65a6a97d3bca1fefa4486002bcf61a
+     * Impact only the desktop interface.
+     */
+    public static function patch_core() {
+        $ver = jeedom::version();
+        if (version_compare($ver, '3.3.7', '<')) {
+            $f = __DIR__ . '/../../../../core/js/plugin.template.js';
+            exec('patch -r - -N -b -i ' . __DIR__ . '/../../plugin_info/plugin.template.js.diff ' . $f);
+            $err = 1;
+            passthru('grep -q "prePrintEqLogic(\$(this).attr(\'data-eqLogic_id\'));" ' . $f, $err);
+            if ($err != 0)
+                jElockyLog::add('error', 'patch du core non effectué: le plugin ne fonctionnera pas correctement');
+        }
+    }
+    
     /*
      * Non obligatoire mais permet de modifier l'affichage du widget si vous en avez besoin
      * public function toHtml($_version = 'dashboard') {
@@ -106,6 +124,7 @@ class jElocky extends eqLogic {
      * log::add('jElocky', $level, 'ElockyAPI::' . $_msg);
      * }
      */
+    
 }
 
 class jElockyCmd extends cmd {

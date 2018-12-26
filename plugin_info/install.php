@@ -23,35 +23,11 @@ require_once __DIR__ . '/../core/class/jElockyUtil.class.php';
 
 
 /**
- * Patch plugin.template.js if required (core version < 3.3.7)
- */
-function jElocky_patch_core() {
-    $ver = jeedom::version();
-    if (version_compare($ver, '3.3.7', '<')) {
-        jElockyLog::add('info', 'le core ' . $ver . ' va être patché pour que le plugin jElocky fonctionne');
-        $f = __DIR__ . '/../../../core/js/plugin.template.js';
-        exec('patch -r - -N -b -i ' . __DIR__ . '/plugin.template.js.diff ' . $f);
-        passthru('grep -q "prePrintEqLogic(\$(this).attr(\'data-eqLogic_id\'));" ' . $f, $err);
-        if ($err == 0)
-            jElockyLog::add('info', 'patch du core correctement effectué');
-        else
-            jElockyLog::add('error', 'patch du core non effectué: le plugin ne fonctionnera pas');
-    }
-    else
-        jElockyLog::add('debug', 'core version >= 3.3.7: no need for patch');
-    
-    log::add('plugin', 'debug', 'End ' . __METHOD__);
-}
-
-/**
  * Called on plugin activation
  */
 function jElocky_install() {
     jElockyLog::startStep(__METHOD__);
     
-    // Patch the core if needed
-    jElocky_patch_core();
-
     // Creation of the data directory
     if (! file_exists(jElockyUtil::DATA_DIR)) {
         jElockyLog::add('info', 'création du répertoire ' . jElockyUtil::DATA_DIR);
@@ -60,7 +36,7 @@ function jElocky_install() {
             ' && chown -R www-data:www-data ' . jElockyUtil::DATA_DIR);
     }
     
-    // Create the api key if not already existing
+    // Create the api key (if not already existing)
     jeedom::getApiKey('jElocky');
     
     jElockyLog::endStep();
@@ -69,12 +45,8 @@ function jElocky_install() {
 /**
  * Called on plugin reactivation after reinstallation or update
  */
-function jElocky_update() {
-    jElockyLog::startStep(__METHOD__);
-    jElocky_patch_core();
-    jElockyLog::endStep();
-}
+//function jElocky_update() {}
 
-function jElocky_remove() {}
+//function jElocky_remove() {}
 
 
