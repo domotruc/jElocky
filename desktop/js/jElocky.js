@@ -112,7 +112,7 @@ function addCmdToTable(_cmd) {
     tr += '<span class="subType" subType="' + init(_cmd.subType) + '"></span>';
     tr += '</td>';
     tr += '<td>';
-    tr += '<input class="cmdAttr form-control input-sm" data-l1key="value" placeholder="{{Valeur}}" readonly=true />';
+    tr += '<input class="form-control input-sm" data-key="value" placeholder="{{Valeur}}" readonly=true />';
     tr += '</td>';
     tr += '<td>';
 	tr += '<input class="cmdAttr form-control input-sm" data-l1key="unite" placeholder="{{Unité}}">';
@@ -131,8 +131,6 @@ function addCmdToTable(_cmd) {
     tr += '</tr>';
     
     id = '#' + _cmd.eqType.substr(_cmd.eqType.indexOf('_')+1) + '_table_cmd';
-    console.log(_cmd);
-    console.log(tr);
     
     $(id + ' tbody').append(tr);
     $(id + ' tbody tr:last').setValues(_cmd, '.cmdAttr');
@@ -140,5 +138,8 @@ function addCmdToTable(_cmd) {
         $(id + ' tbody tr:last .cmdAttr[data-l1key=type]').value(init(_cmd.type));
     }
     jeedom.cmd.changeType($(id + ' tbody tr:last'), init(_cmd.subType));
-    $(id + ' tbody tr:last .cmdAttr[data-l1key=value]').show();
+    //$(id + ' tbody tr:last .cmdAttr[data-l1key=value]').show();
+    jeedom.cmd.update[_cmd.id] = function(_options) {
+        $('.cmd[data-cmd_id=' + _cmd.id + '] .form-control[data-key=value]').value(_options.display_value);
+    }
 }
