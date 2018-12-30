@@ -8,13 +8,13 @@
     <ul class="nav nav-tabs" role="tablist">
         <li role="presentation"><a class="eqLogicAction cursor" aria-controls="home" role="tab"
             data-action="returnToThumbnailDisplay"><i class="fa fa-arrow-circle-left"></i></a></li>
-        <li role="presentation" class="active"><a href="#object_eqtab" aria-controls="home" role="tab" data-toggle="tab"><i
+        <li role="presentation" class="active"><a href="#eqtab" aria-controls="home" role="tab" data-toggle="tab"><i
                 class="fa fa-tachometer"></i> {{Equipement}}</a></li>
-        <li role="presentation"><a href="#object_cmdtab" aria-controls="profile" role="tab" data-toggle="tab"><i
+        <li role="presentation"><a href="#cmdtab" aria-controls="profile" role="tab" data-toggle="tab"><i
                 class="fa fa-list-alt"></i> {{Commandes}}</a></li>
     </ul>
     <div class="tab-content" style="height: calc(100% - 50px); overflow: auto; overflow-x: hidden;">
-        <div role="tabpanel" class="tab-pane active" id="object_eqtab">
+        <div role="tabpanel" class="tab-pane active" id="eqtab">
             <br />
             <div class="col-sm-7">
                 <form class="form-horizontal">
@@ -71,7 +71,7 @@
                 </div>
             </div>
         </div>
-        <div role="tabpanel" class="tab-pane" id="object_cmdtab">
+        <div role="tabpanel" class="tab-pane" id="cmdtab">
             <a class="btn btn-success btn-sm cmdAction pull-right" data-action="add" style="margin-top: 5px;"><i
                 class="fa fa-plus-circle"></i> {{Commandes}}</a><br /> <br />
             <table id="object_table_cmd" class="table table-bordered table-condensed">

@@ -89,6 +89,30 @@ observer.observe($("#div_alert")[0], {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
+ * Override eqLogic page tab management to synchronise the tabs in all eqLogic
+ */
+$('.eqLogic a[data-toggle=tab]').on('click', function () {
+    selected_tab = this.hash;
+    $('.eqLogic').each(function() {
+        if ($(this).find('a[href="' + selected_tab + '"]').length > 0) {
+            $(this).find('a[data-toggle=tab]').each(function() {
+                if (this.hash == selected_tab)
+                    $(this).attr('aria-expanded', true).closest('li').addClass("active");
+                else
+                    $(this).attr('aria-expanded', false).closest('li').removeClass("active");
+            }).end().find('.tab-pane').each(function() {
+                if ($(this).is(selected_tab))
+                    $(this).addClass("active");
+                else
+                    $(this).removeClass("active");
+            });
+        }
+    });
+});
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
  * Fonction pour l'ajout de commande, appellé automatiquement par plugin.template
  */
 function addCmdToTable(_cmd) {
