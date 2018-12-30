@@ -59,7 +59,7 @@ class jElocky_object extends eqLogic {
         // Serrure
         array(
             'nbAccess' => array('id' => 'nbAccess', 'stype' => 'numeric'),
-            'battery' => array('id' => 'battery', 'stype' => 'numeric'),
+            'battery' => array('id' => 'battery', 'stype' => 'numeric', 'unit' => '%'),
             'version' => array('id' => 'version', 'stype' => 'string'),
             'veille' => array('id' => 'veille', 'stype' => 'numeric'),
             'connection' => array('id' => 'connection', 'stype' => 'numeric'),

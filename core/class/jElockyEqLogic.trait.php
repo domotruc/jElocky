@@ -85,6 +85,8 @@ trait jElockyEqLogic {
                 }
                 $val = key_exists('process', $def) ? call_user_func($def['process'], $data[$key]) : $data[$key];
                 $cmd->event($val);
+                if ($def['id'] == 'battery')
+                    $this->batteryStatus($val);
                 jElockyLog::add('info', '->' . $this->getName() . '|' . $cmd->getName() . ' ' . $data[$key]);
             }
             else {
