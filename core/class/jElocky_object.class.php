@@ -64,7 +64,7 @@ class jElocky_object extends eqLogic {
             'veille' => array('id' => 'veille', 'stype' => 'numeric'),
             'connection' => array('id' => 'connection', 'stype' => 'numeric'),
             'programme' => array('id' => 'programme', 'stype' => 'numeric'),
-            'tension' => array('id' => 'tension', 'stype' => 'numeric'),
+            'tension' => array('id' => 'tension', 'stype' => 'numeric', 'process' => array(self::class, 'convertVoltage'), 'unit' => 'V'),
             'maj' => array('id' => 'maj', 'stype' => 'numeric'),
             'reveille' => array('id' => 'reveille', 'stype' => 'numeric'),
             'date_battery' => array('id' => 'date_battery', 'stype' => 'string')
@@ -156,7 +156,16 @@ class jElocky_object extends eqLogic {
         if ($this->getIsEnable()) {
             $this->setCmdData(self::$_cmds_def_matrix[$object[self::KEY_TYPE_BOARD]], $object);
         }
-    }    
+    }
+    
+    /**
+     * Converts battery voltage from mV to V
+     * @param number $val tension
+     * @return number
+     */
+    private static function convertVoltage($tension) {
+        return round($tension/1000, 3);
+    }
 }
 
 class jElocky_objectCmd extends cmd {

@@ -3,7 +3,7 @@ if (! isConnect('admin')) {
     throw new Exception('{{401 - Accès non autorisé}}');
 }
 
-$plugin = plugin::byId('jElocky');
+plugin::byId('jElocky');
 sendVarToJS('eqType', jElocky::class);
 sendVarToJS('DATA_DIR', jElockyUtil::getRelativeDataDir());
 

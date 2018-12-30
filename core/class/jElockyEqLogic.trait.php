@@ -61,6 +61,12 @@ trait jElockyEqLogic {
         }
     }
        
+    /**
+     * Updates the commands of this object with the information retrieved from the Elocky server
+     * Commands are created if not already existing
+     * @param array $defs array listing/defining info from $data to be converted into commands
+     * @param array $data array data array retrieved from the Elocky server
+     */
     private function setCmdData($defs, $data) {
         foreach($defs as $key => $def) {
             if (key_exists($key, $data)) {
@@ -73,9 +79,12 @@ trait jElockyEqLogic {
                     $cmd->setSubType($def['stype']);
                     $cmd->setLogicalId($def['id']);
                     $cmd->setIsVisible(1);
-                    $cmd->save();
+                    if (key_exists('unit', $def))
+                        $cmd->setUnite($def['unit']);
+                    $cmd->save();    
                 }
-                $cmd->event($data[$key]);
+                $val = key_exists('process', $def) ? call_user_func($def['process'], $data[$key]) : $data[$key];
+                $cmd->event($val);
                 jElockyLog::add('info', '->' . $this->getName() . '|' . $cmd->getName() . ' ' . $data[$key]);
             }
             else {

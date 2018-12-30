@@ -28,7 +28,6 @@ $(document).ready(function() {
     });
 });
 
-
 $("#table_cmd").sortable({axis: "y", cursor: "move", items: ".cmd", placeholder: "ui-state-highlight", tolerance: "intersect", forcePlaceholderSize: true});
 
 function callAjax(_action_id, _eq_id, _async) {
@@ -77,7 +76,6 @@ var observer = new MutationObserver(function(mutations) {
 	mutations.forEach(function(mutation) {
 		if (mutation.addedNodes !== null) {
 			if (eqType.startsWith('jElocky')) {
-				console.log('MutationObserver: eqType=' + eqType);
 				eqType = 'jElocky';
 			}
 		}
