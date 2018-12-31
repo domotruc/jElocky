@@ -21,7 +21,6 @@ require_once __DIR__ . '/../../../core/php/core.inc.php';
 require_once __DIR__ . '/../core/class/jElockyLog.class.php';
 require_once __DIR__ . '/../core/class/jElockyUtil.class.php';
 
-
 /**
  * Called on plugin activation
  */
@@ -38,7 +37,7 @@ function jElocky_install() {
     
     // Create the api key (if not already existing)
     jeedom::getApiKey('jElocky');
-    
+      
     jElockyLog::endStep();
 }
 

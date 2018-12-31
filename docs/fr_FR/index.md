@@ -39,7 +39,9 @@ Déclencher l'alarme d'un lieu
 
 L'URL est:
 
-`http://#IP_JEEDOM#/plugins/jElocky/core/api/jeeElocky.php?apikey=#APIKEY#&action=trig_alarm&id=`
+`http://#IP_JEEDOM#/plugins/jElocky/core/api/jeeElocky.php?apikey=#APIKEY#&action=trig_alarm&id=#ID#`
+
+où #ID# est l'id du lieu.
 
 
 

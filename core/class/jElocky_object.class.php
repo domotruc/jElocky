@@ -34,17 +34,21 @@ class jElocky_object extends eqLogic {
     
     use jElockyEqLogic;
     
-    // Object type
+    // Object type (as per Elocky API)
     const ID_PASSERELLE = 0;
     const ID_SERRURE = 1;
     const ID_BEACON = 2;
     
+    // Data keys returned by the Elocky API
     const KEY_BOARD = 'board';
     const KEY_PASSERELLE = 'passerelle';
     const KEY_TYPE_BOARD = 'type_board';
     const KEY_OBJECT_ID = 'reference';
     
-    const TYPES = array('passerelle', 'serrure', 'beacon');
+    const TYP_PASSERELLE = 'passerelle';
+    const TYP_SERRURE = 'serrure';
+    const TYP_BEACON = 'beacon';
+    const TYPES = array(self::TYP_PASSERELLE, self::TYP_SERRURE, self::TYP_BEACON);
     
     private static $_cmds_def_matrix = array(
         // Passerelle
@@ -88,18 +92,23 @@ class jElocky_object extends eqLogic {
             jElockyLog::add('debug', 'object ' . $object_eql->getName() . ' exists');
         }
         else {
+            $type = self::TYPES[$object[self::KEY_TYPE_BOARD]];
             $object_eql = new jElocky_object();
             $object_eql->setName($object['name']);
             $object_eql->setEqType_name(__CLASS__);
             $object_eql->setLogicalId($object[self::KEY_OBJECT_ID]);
             $object_eql->setIsEnable(1);
-            $object_eql->setConfiguration(self::KEY_TYPE_BOARD, self::TYPES[$object[self::KEY_TYPE_BOARD]]);
+            $object_eql->setConfiguration(self::KEY_TYPE_BOARD, $type);
             $object_eql->setConfiguration('place_id', $place_id);
+
+            if ($type == self::TYP_SERRURE) {
+                $object_eql->setConfiguration('battery_type', '1x3.6V ER14250');
+            }
             
             // Save the place directly: required before creating command
             $object_eql->save(true);
                        
-            jElockyLog::add('info', 'creating object ' . $object_eql->getName() . ' of type ' . self::TYPES[$type]);
+            jElockyLog::add('info', 'creating object ' . $object_eql->getName() . ' of type ' . $type);
         }
          
         return $object_eql;

@@ -213,7 +213,7 @@ class jElocky_place extends eqLogic {
 
     /**
      * Request and return all the object of this place, or the specified one if $object_id is provided.
-     * *
+     *
      * If $object_id < 0:
      *    Return an array of objects
      * @param int $object_id id of the specific object to retrieve, -1 (default) to retrieve all objects
