@@ -1,7 +1,7 @@
 {
 	"id" : "jElocky",
 	"name" : "jElocky",
-	"description" : "Plugin de gestion des serrures connectées elocky",
+	"description" : "Plugin de gestion des produits Elocky (serrures, box, beacon)",
 	"licence" : "AGPL",
 	"author" : "domotruc",
 	"require" : "3.2",
@@ -9,11 +9,11 @@
 	"hasDependency" : false,
 	"hasOwnDeamon" : false,
 	"maxDependancyInstallTime" : 0,
-	"changelog" : "https://jeedom.github.io/plugin-template/#language#/changelog",
-	"documentation" : "https://jeedom.github.io/plugin-template/#language#/",
+	"changelog" : "https://jeedom.github.io/jElocky/#language#/changelog",
+	"documentation" : "https://jeedom.github.io/jElocky/#language#/",
 	"link" : {
-		"forum":"Lien vers le forum"
+		"forum":"https://www.jeedom.com/forum/viewtopic.php?f=134&t=38672&hilit=jelocky"
 	},
-	"language" : ["fr_FR","en_US","de_DE","sp_SP"],
+	"language" : ["fr_FR","en_US","sp_SP"],
 	"compatibility" : ["miniplus","smart","rpi","docker","diy","mobile"]
 }
