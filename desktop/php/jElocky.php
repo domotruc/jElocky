@@ -25,11 +25,9 @@ function displayActionCard($_action_name, $_action, $_eqLogic_type, $_fa_icon, $
     $eqLogic_type = isset($_eqLogic_type) ? ' data-eqLogic_type="' . $_eqLogic_type . '"' : '';
     echo '<div class="cursor eqLogicAction" data-action="' . $_action . '"' . $eqLogic_type .
         ' style="text-align:center;background-color:#ffffff;height:200px;width:160px;margin-bottom:10px;padding:5px;border-radius:2px;margin-right:10px;float:left;" >';
-//    echo '<div class="center-block" style="width:130px;height:130px;line-height:130px;vertical-align: middle;text-align:center;">';
     echo '<div class="center-block" style="width:130px;height:130px;display:flex;align-items: center;justify-content:center;">';
     echo '<i class="fa ' . $_fa_icon . '" style="font-size:6em;color:' . $_card_color . ';"></i>';
     echo "</div>";
-    //echo '<br>';
     echo '<span style="font-size:1.1em;font-weight:bold;position:relative;top:10px;word-break:break-all;white-space:pre-wrap;word-wrap:break-word;">' . $_action_name . '</span>';
     echo '</div>';
 }
@@ -46,8 +44,6 @@ function displayEqLogicCard($_eqLogic) {
     echo '<div class="center-block" style="width:130px;height:130px;background-color:#f8d800;border-radius:30px;display:flex;align-items:center;">';
     echo '<img src="' . $_eqLogic->getPhoto() .
         '" class="img-responsive center-block" style="max-width:105px;max-height:105px;border-radius:20px;"/>';
-    // echo '<i class="fa fa-male" style="font-size:6em;color:#f8d800;"></i>';
-    // echo '<img src="' . $plugin->getPathImgIcon() . '" height="105" width="95" />';
     echo "</div>";
     echo '<span style="font-size:1.1em;position:relative;top:10px;word-break:break-all;white-space:pre-wrap;word-wrap:break-word;">' .
         $_eqLogic->getHumanName(true, true) . '</span>';
@@ -60,9 +56,7 @@ function displayEqLogicCard($_eqLogic) {
     <div class="col-lg-2 col-md-3 col-sm-4">
         <div class="bs-sidebar">
             <a class="btn btn-default eqLogicAction" style="width: 100%; margin-top: 5px; margin-bottom: 5px;"
-                data-action="add" data-eqLogic_type="jElocky_user"><i class="fa fa-plus-circle"></i> {{Ajouter un
-                utilisateur}}</a> <a class="filter" style="margin-bottom: 5px;"><input
-                class="filter form-control input-sm" placeholder="{{Rechercher}}" style="width: 100%" /></a>
+                data-action="add" data-eqLogic_type="jElocky_user"><i class="fa fa-plus-circle"></i> {{Ajouter un utilisateur}}</a>
             <ul id="ul_eqLogic" class="nav nav-list bs-sidenav">
                 <li><i class="fa fa-male"></i><span> {{Utilisateurs}}</span>
                     <ul class="nav nav-list bs-sidenav sub-nav-list">
@@ -108,32 +102,27 @@ function displayEqLogicCard($_eqLogic) {
                 <legend>
                     <i class="fa fa-male"></i> {{Utilisateurs}}
                 </legend>
-<!--                 <div class="eqLogicThumbnailContainer"> -->
                 <?php
                 foreach ($eqUsers as $eqU) {
                     displayEqLogicCard($eqU);
                 }
                 displayActionCard('{{Ajouter un utilisateur}}', 'add', 'jElocky_user', 'fa-plus-circle', '#f8d800');
                 ?>
-<!--                 </div> -->
             </div>
             <div class="col-lg-6 col-md-6 col-sm-6">
                 <legend>
                     <i class="fa fa-cog"></i> {{Gestion}}
                 </legend>
-<!--                 <div class="eqLogicThumbnailContainer"> -->
                     <?php
                     displayActionCard('{{Configuration}}', 'gotoPluginConf', null, 'fa-wrench', '#767676');
                     ?>
-<!--                 </div> -->
             </div>
         </div>
 
-        <legend>
-            <i class="fa fa-home"></i> {{Lieux}}
-        </legend>
-        <ul class="nav nav-tabs" role="tablist">
-            <?php
+        <?php
+        if (count($eqPlaces) > 0) {
+            echo '<legend><i class="fa fa-home"></i> {{Lieux}}</legend>';
+            echo '<ul class="nav nav-tabs" role="tablist">';
             $active = ' class="active"';
             foreach ($eqPlaces as $eqP) {
                 echo '<li role="presentation"' . $active . '><a href="#' . $eqP->getId() .
@@ -141,12 +130,9 @@ function displayEqLogicCard($_eqLogic) {
                     '</a></li>';
                 $active = '';
             }
-            ?>
-        </ul>
+            echo '</ul>';
 
-        <div class="tab-content">
-            <br>
-            <?php
+            echo '<div class="tab-content"><br>';
             $active = ' in active';
             /* @var jElocky_user $eqU */
             foreach ($eqPlaces as $eqP) {
@@ -167,8 +153,9 @@ function displayEqLogicCard($_eqLogic) {
                 }
                 echo '</div>';
             }
-            ?>
-        </div>
+            echo '</div>';
+        }
+        ?>
     </div>
 
     <?php include_file('desktop', 'jElocky_user', 'php', 'jElocky'); ?>

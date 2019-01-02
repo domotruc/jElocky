@@ -9,7 +9,7 @@
         <li role="presentation"><a class="eqLogicAction cursor" aria-controls="home" role="tab"
             data-action="returnToThumbnailDisplay"><i class="fa fa-arrow-circle-left"></i></a></li>
         <li role="presentation" class="active"><a href="#eqtab" aria-controls="home" role="tab" data-toggle="tab"><i
-                class="fa fa-tachometer"></i> {{Equipement}}</a></li>
+                class="fa fa-tachometer"></i> {{Informations}}</a></li>
         <li role="presentation"><a href="#cmdtab" aria-controls="profile" role="tab" data-toggle="tab"><i
                 class="fa fa-list-alt"></i> {{Commandes}}</a></li>
     </ul>
