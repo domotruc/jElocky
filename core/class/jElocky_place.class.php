@@ -73,7 +73,7 @@ class jElocky_place extends eqLogic {
                     jElocky_placeCmd::ALARM_TRIGGERED_ID => array('id' => jElocky_placeCmd::ALARM_TRIGGERED_ID,
                         'stype' => 'binary')), array(jElocky_placeCmd::ALARM_TRIGGERED_ID => 0));
             
-            jElockyLog::add('info', 'creating place ' . $place_eql->getName());
+            jElockyLog::add('info', 'création lieu ' . $place_eql->getName());
         }
         
         if ($place_eql->getIsEnable()) {
@@ -122,6 +122,20 @@ class jElocky_place extends eqLogic {
         jElockyLog::endStep();
     }
 
+    /**
+     * Called on place removal
+     * Removes attached objects
+     */
+    public function preRemove() {
+        $this->startLogStep(__METHOD__);
+        jElockyLog::add('info', 'suppression lieu ' . $this->getName() . ' (id=' . $this->getId() . ')');
+        $objects = $this->getObjects();
+        foreach ($objects as $object) {
+            $object->remove();
+        }
+        jElockyLog::endStep();
+    }
+    
     /**
      * Update data that shall be updated frequently
      * (only commands are updated)

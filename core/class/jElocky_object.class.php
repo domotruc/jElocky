@@ -134,6 +134,16 @@ class jElocky_object extends eqLogic {
     }
     
     /**
+     * Called on object removal
+     * Log a message
+     */
+    public function preRemove() {
+        $this->startLogStep(__METHOD__);
+        jElockyLog::add('info', 'suppression objet ' . $this->getName() . ' (id=' . $this->getId() . ')');
+        jElockyLog::endStep();
+    }
+    
+    /**
      * Return the photo pathname of this jElocky_object
      * @return string full filename on the jeedom server
      */
