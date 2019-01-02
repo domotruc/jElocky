@@ -17,23 +17,31 @@
  */
 
 /* ****************************** Includes ********************************* */
-//require_once __DIR__ . '/../../../../core/php/core.inc.php';
+require_once __DIR__ . '/../../../../core/php/core.inc.php';
 
 class jElockyLog {
     
     const LOG_FILE = 'jElocky';
     
-    private static $levels;
+    /**
+     * @var int $log_level plugin log level. Do not use directly => call getLogLevel.
+     */
+    private static $log_level;
+    
+    /**
+     * @var array[int] $indentation_level indentation level by pid
+     */
+    private static $indentation_level;
     
     public static function startStep($step) {
         $pid = getmypid();
         
         self::log($pid, 'debug', '> begin ' . $step);
         
-        if (array_key_exists($pid, self::$levels))
-            self::$levels[$pid] = self::$levels[$pid] + 1;
+        if (array_key_exists($pid, self::$indentation_level))
+            self::$indentation_level[$pid] = self::$indentation_level[$pid] + 1;
         else
-            self::$levels[$pid] = 1;
+            self::$indentation_level[$pid] = 1;
 
     }
     
@@ -49,17 +57,16 @@ class jElockyLog {
     public static function endStep() {
         $pid = getmypid();
 
-        if (array_key_exists($pid, self::$levels)) {
-            self::$levels[$pid] = self::$levels[$pid] - 1;
-            if (self::$levels[$pid] == 0)
-                unset(self::$levels[$pid]);
+        if (array_key_exists($pid, self::$indentation_level)) {
+            self::$indentation_level[$pid] = self::$indentation_level[$pid] - 1;
+            if (self::$indentation_level[$pid] == 0)
+                unset(self::$indentation_level[$pid]);
         }
         
         self::log($pid, 'debug', '< end ');
     }
     
     private static function log($key, $type, $msg, $logicalId='') {
-        
         switch ($type) {
             case 'debug':
             case 'error':
@@ -71,12 +78,23 @@ class jElockyLog {
             default:
                 $keyPrefix = '';
         }
-                
-        if (array_key_exists($key, self::$levels))
-            $msgPrefix = str_repeat(' ', self::$levels[$key]*3);
+                        
+        if (array_key_exists($key, self::$indentation_level))
+            $msgPrefix = str_repeat(' ', self::$indentation_level[$key]*3);
         else
             $msgPrefix = '';
         
-        log::add(self::LOG_FILE, $type, $keyPrefix . sprintf('%5d', $key) . '|' . $msgPrefix . $msg, $logicalId);
+        if (self::getLogLevel() == 'debug')        
+            log::add(self::LOG_FILE, $type, $keyPrefix . sprintf('%5d', $key) . '|' . $msgPrefix . $msg, $logicalId);
+        else
+            log::add(self::LOG_FILE, $type, $keyPrefix . $msgPrefix . $msg, $logicalId);
+    }
+    
+    private static function getLogLevel() {
+        if (! isset(self::$log_level)) {
+            self::$log_level = log::convertLogLevel(log::getLogLevel(self::LOG_FILE));
+            self::add('debug', 'get plugin log level: ' . self::$log_level);
+        }
+        return self::$log_level;
     }
 }

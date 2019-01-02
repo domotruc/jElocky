@@ -84,12 +84,12 @@ class jElocky_object extends eqLogic {
      */
     public static function getInstance($object, $place_id) {
         
-        /* @var jElocky_place $place_eql*/
+        /* @var jElocky_object $object_eql*/
         $object_eql = self::byLogicalId($object[self::KEY_OBJECT_ID], self::class);
         
         // Object creation if necessary
         if (is_object($object_eql)) {
-            jElockyLog::add('debug', 'object ' . $object_eql->getName() . ' exists');
+            jElockyLog::add('debug', 'object ' . $object_eql->getName() . ' exists (id=' . $object_eql->getId() . ')');
         }
         else {
             $type = self::TYPES[$object[self::KEY_TYPE_BOARD]];
