@@ -116,10 +116,10 @@ class jElocky_object extends eqLogic {
     
     /**
      * Update this object information
-     * This place shall be saved after calling this method
+     * @var boolean $to_save whether or not this object shall be saved after update (true by default)
      * @throws \Exception in case of connexion error with the Elocky server
      */
-    public function update1() {
+    public function update1($to_save=true) {
         $this->startLogStep(__METHOD__);
         
         if ($this->getIsEnable()) {
@@ -128,11 +128,16 @@ class jElocky_object extends eqLogic {
             $object = $place_eql->requestObjects($this->getLogicalId());
             $this->updateConfiguration($object);
             $this->updateCommands($object);
+            if ($to_save)
+                $this->save(true);
         }
         
         jElockyLog::endStep();
     }
-    
+
+    // Shall be kept
+    public function update2() {}
+        
     /**
      * Called on object removal
      * Log a message
@@ -164,7 +169,6 @@ class jElocky_object extends eqLogic {
                 $keys[] = 'id';            
             $this->setMultipleConfiguration($keys, $object);
         }
-        //jElockyLog::add('debug', 'place ' . $place_eql->getName() . ' is disabled');
     }
     
     /**

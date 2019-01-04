@@ -15,6 +15,21 @@
  * along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
  */
 
+//Return the plugin base URL
+//Parameters id, saveSuccessFull, removeSuccessFull are removed if present
+function initPluginUrl(_filter=['id','saveSuccessFull','removeSuccessFull']) {
+    var vars = getUrlVars();
+    var url = '';
+    for (var i in vars) {
+        if ($.inArray(i,_filter) < 0) {
+            if (url.length > 0)
+                url += '&';
+            url += i + '=' + vars[i].replace('#', '');
+        }
+    }
+    return 'index.php?' + url;
+}
+
 $(document).ready(function() {
     $('.eqLogicAttr[data-l1key=configuration][data-l2key=photo]').on('change', function () {
         if($(this).value() != '' && $('.li_eqLogic.active').attr('data-eqlogic_id') != '') {
@@ -28,7 +43,17 @@ $(document).ready(function() {
     });
 });
 
-$("#table_cmd").sortable({axis: "y", cursor: "move", items: ".cmd", placeholder: "ui-state-highlight", tolerance: "intersect", forcePlaceholderSize: true});
+//Override plugin template to rewrite the URL to avoid keeping the successfull save message
+if (getUrlVars('saveSuccessFull') == 1) {
+    $('#div_alert').showAlert({message: '{{Sauvegarde effectuée avec succès}}', level: 'success'});
+    history.replaceState(history.state, '', initPluginUrl(['saveSuccessFull']));
+}
+
+//Override plugin template to rewrite the URL to avoid keeping the successfull delete message
+if (getUrlVars('removeSuccessFull') == 1) {
+    $('#div_alert').showAlert({message: '{{Suppression effectuée avec succès}}', level: 'success'});
+    history.replaceState(history.state, '', initPluginUrl(['removeSuccessFull']));
+}
 
 function callAjax(_action_id, _eq_id, _async) {
 	$.ajax({
@@ -111,6 +136,8 @@ $('.eqLogic a[data-toggle=tab]').on('click', function () {
 });
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+$("#table_cmd").sortable({axis: "y", cursor: "move", items: ".cmd", placeholder: "ui-state-highlight", tolerance: "intersect", forcePlaceholderSize: true});
 
 /*
  * Fonction pour l'ajout de commande, appellé automatiquement par plugin.template

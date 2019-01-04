@@ -36,50 +36,17 @@ class jElocky_user extends eqLogic implements LoggerInterface {
     use ElockyAPILogger;
     
     use jElockyEqLogic;
-    
-    /**
-     * @var boolean
-     */
-    private $_to_update = false;
-    
-    private $_api;
-
-    public function preInsert() {
-        $this->startLogStep(__METHOD__);
-        jElockyLog::endStep();
-    }
-
-    public function postInsert() {
-        $this->startLogStep(__METHOD__);
-        jElockyLog::endStep();
-    }
-
-    public function preSave() {
-        $this->startLogStep(__METHOD__);
-        if ($this->_to_update)
-            $this->update1();
-        jElockyLog::endStep();
-    }
-
-    public function postSave() {
-        $this->startLogStep(__METHOD__);
-        if ($this->_to_update) {
-            $this->update2();
-            $this->_to_update = false;
-        }
         
-        // Update the user photo if needed
-        $this->updatePhoto('requestUserPhoto');
-        jElockyLog::endStep();
-    }
+    private $_api;
    
     /**
      * Update this user information
      * Intended to be called when entering the equipment page or in preSave
      * This user shall be save after calling this method
+     * @var boolean $to_save whether or not this user shall be saved after update (true by default)
      * @throws \Exception in case of connexion error with the Elocky server
      */
-    public function update1() {
+    public function update1($to_save=true) {
         $this->startLogStep(__METHOD__);
         if (($api = $this->getAPI()) != null) {
             try {
@@ -88,6 +55,8 @@ class jElocky_user extends eqLogic implements LoggerInterface {
                     $userProfile);
                 $this->setLogicalId($userProfile['reference']);
                 $this->updateAPI();
+                if ($to_save)
+                    $this->save();
             } catch (\Exception $e) {
                 $this->processElockyException($e->getMessage(), true);
             }
@@ -96,9 +65,8 @@ class jElocky_user extends eqLogic implements LoggerInterface {
     }
 
     /**
-     * Update this user information that are not updated in update1: places,
+     * Update this user information that are not updated in update1: places, objects,
      * photo (image).
-     * Intended to be called in postSave.
      * It is not required to save this user fater calling this method.
      * @throws \Exception in case of connexion error with the Elocky server
      */
@@ -111,8 +79,14 @@ class jElocky_user extends eqLogic implements LoggerInterface {
                     $place_eql = jElocky_place::getInstance($place);
                     $place_eql->addUser($this->getId(), $place['admin_address'][0]['state'],
                         $place['admin_address'][0]['name']);
+                    $place_eql->updateConfiguration($place);
+                    $place_eql->updateCommands($place);
+                    $place_eql->requestObjectsAndUpdate(true);
                     $place_eql->save();
                 }
+                
+                // Update the user photo if needed
+                $this->updatePhoto('requestUserPhoto');
             }
             catch (Exception $e) {
                 $this->processElockyException($e->getMessage(), true);
@@ -121,23 +95,36 @@ class jElocky_user extends eqLogic implements LoggerInterface {
         jElockyLog::endStep();
     }
     
-    public static function cronLowFreq() {
-        jElockyLog::startStep(__METHOD__);
-        foreach (self::byType(__CLASS__, true) as $user_eql) {
-            $user_eql->update1();
-            $user_eql->save();
-            $user_eql->update2();
+    /**
+     * Called on user removal
+     * Remove the user from its related places.
+     * Remove places without any user
+     */
+    public function preRemove() {
+        $this->startLogStep(__METHOD__);
+        jElockyLog::add('info', 'suppression utilisateur ' . $this->getName() . ' (id=' . $this->getId() . ')');
+        $places = $this->getPlaces();
+        foreach ($places as $place) {
+            $place->removeUser($this->getId());
+            $place->save(true);
+            if (!$place->hasUser())
+                $place->remove();
         }
         jElockyLog::endStep();
     }
     
-    public function setIsEnable($_isEnable) {
-        if (!$this->getIsEnable() && $_isEnable)
-            $this->_to_update = true;
-           
-        return parent::setIsEnable($_isEnable);
+    /**
+     * Perform a full update of all users, including associated places and objects
+     */
+    public static function update_all() {
+        jElockyLog::startStep(__METHOD__);
+        foreach (self::byType(__CLASS__, true) as $user_eql) {
+            $user_eql->update1();
+            $user_eql->update2();
+        }
+        jElockyLog::endStep();
     }
-   
+     
     /**
      * Return places of this user
      * @return array[jElocky_place] array of the places of this user
@@ -185,7 +172,7 @@ class jElocky_user extends eqLogic implements LoggerInterface {
      */
     public function requestPlaces($place_id=-1) {
         jElockyLog::add('debug', 'requesting ' . ($place_id >= 0 ? 'place ' . $place_id : ' places') .
-            ' for user ' . $this->getName());
+            ' with user ' . $this->getName());
         
         $api = $this->getAPI();
         if ($api !== null) {

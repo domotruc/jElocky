@@ -57,6 +57,6 @@ trait ElockyAPILogger {
                 $type = 'debug';
         }
         
-        jElockyLog::add($type, 'ElockyAPI::' . $message);
+        jElockyLog::add($type, 'ElockyAPI' . $message);
     }
 }

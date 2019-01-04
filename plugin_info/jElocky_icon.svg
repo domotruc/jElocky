@@ -14,8 +14,11 @@
    viewBox="0 0 309 348.00001"
    id="svg4163"
    version="1.1"
-   inkscape:version="0.91 r13725"
-   sodipodi:docname="elocky.svg">
+   inkscape:version="0.92.3 (2405546, 2018-03-11)"
+   sodipodi:docname="jElocky_icon.svg"
+   inkscape:export-filename="/home/domotruc/docker/dev-jeedom/plugins/jElocky/plugin_info/jElocky_icon.svg.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96">
   <defs
      id="defs4165" />
   <sodipodi:namedview
@@ -26,16 +29,16 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.3746772"
-     inkscape:cx="147.60445"
-     inkscape:cy="151.07049"
+     inkscape:cx="70.330789"
+     inkscape:cy="167.91488"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
      units="px"
-     inkscape:window-width="1855"
-     inkscape:window-height="1056"
-     inkscape:window-x="65"
-     inkscape:window-y="24"
+     inkscape:window-width="1853"
+     inkscape:window-height="1025"
+     inkscape:window-x="67"
+     inkscape:window-y="27"
      inkscape:window-maximized="1"
      inkscape:snap-bbox="false"
      inkscape:snap-page="true">
@@ -51,7 +54,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -77,44 +80,40 @@
      id="layer1"
      transform="translate(0,-704.36214)"
      style="display:inline">
-    <g
-       id="g4951"
-       transform="matrix(1.139017,0,0,1.139017,-21.478122,-60.41794)">
-      <circle
-         r="53.283726"
-         cy="806.6048"
-         cx="152.52937"
-         id="path4796"
-         style="opacity:1;fill:#00aca6;fill-opacity:1;stroke:#ffffff;stroke-width:15;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
-      <path
-         sodipodi:open="true"
-         d="M 239.82504,856.48656 A 98.52002,98.52002 0 0 1 115.71206,897.79145 98.52002,98.52002 0 0 1 59.979192,779.45306 98.52002,98.52002 0 0 1 170.87262,710.07889 98.52002,98.52002 0 0 1 252.90886,811.96207"
-         sodipodi:end="0.04805643"
-         sodipodi:start="0.52356578"
-         sodipodi:ry="98.52002"
-         sodipodi:rx="98.52002"
-         sodipodi:cy="807.22937"
-         sodipodi:cx="154.50258"
-         sodipodi:type="arc"
-         id="path4796-7"
-         style="opacity:1;fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:15;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
-      <path
-         sodipodi:nodetypes="ccccc"
-         inkscape:connector-curvature="0"
-         id="path4831"
-         d="m 260.44664,812.2877 -50.26578,0 0,-14.68553 46.47579,0 z"
-         style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
-    </g>
+    <circle
+       style="opacity:1;fill:#00aca6;fill-opacity:1;stroke:#ffffff;stroke-width:17.08525467;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="path4796"
+       cx="152.25543"
+       cy="858.31866"
+       r="60.691071" />
+    <path
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:17.08525467;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="path4796-7"
+       sodipodi:type="arc"
+       sodipodi:cx="154.50294"
+       sodipodi:cy="859.03003"
+       sodipodi:rx="112.21598"
+       sodipodi:ry="112.21598"
+       sodipodi:start="0.52356578"
+       sodipodi:end="0.04805643"
+       d="M 251.68669,915.13481 A 112.21598,112.21598 0 0 1 110.31988,962.18178 112.21598,112.21598 0 0 1 46.839198,827.39233 112.21598,112.21598 0 0 1 173.1487,748.37398 112.21598,112.21598 0 0 1 266.58937,864.42065"
+       sodipodi:open="true" />
+    <path
+       style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.13901699px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 275.17503,864.79156 h -57.25358 v -16.72707 h 52.93672 z"
+       id="path4831"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:600;font-stretch:normal;font-size:37.87434387px;line-height:125%;font-family:'URW Gothic L';-inkscape-font-specification:'URW Gothic L, Semi-Bold';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#f8d800;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;"
+       style="font-style:normal;font-variant:normal;font-weight:600;font-stretch:normal;line-height:0%;font-family:'URW Gothic L';-inkscape-font-specification:'URW Gothic L, Semi-Bold';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#f8d800;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="88.866425"
        y="1045.3553"
-       id="text4852"
-       sodipodi:linespacing="125%"><tspan
+       id="text4852"><tspan
          sodipodi:role="line"
          id="tspan4856"
          x="88.866425"
-         y="1045.3553">jElocky</tspan></text>
+         y="1045.3553"
+         style="font-size:37.87434387px;line-height:1.25">jElocky</tspan></text>
   </g>
 </svg>

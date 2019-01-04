@@ -46,8 +46,12 @@ class jElocky extends eqLogic {
         jElockyLog::startStep(__METHOD__);
         // To avoid running cron task if cronHourly is in progress
         if (cache::byKey('plugin::cronHourly::inprogress')->getValue() == 0 ||
-            cache::byKey('plugin::cronHourly::last')->getValue() != __CLASS__)
+            cache::byKey('plugin::cronHourly::last')->getValue() != __CLASS__) {
             jElocky_place::cronHighFreq();
+            }
+        else {
+            jElockyLog::add('debug', 'cronHourly is running: exit');
+        }
         jElockyLog::endStep();
     }
 
@@ -57,8 +61,8 @@ class jElocky extends eqLogic {
     public static function cronHourly() {
         jElockyLog::startStep(__METHOD__);
         
-        // Note: perform a full update at user level which update also places
-        jElocky_user::cronLowFreq();
+        // Note: perform a full update at user level (which update also places and objects)
+        jElocky_user::update_all();
         
         jElockyLog::endStep();
     }

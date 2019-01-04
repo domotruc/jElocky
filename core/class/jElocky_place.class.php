@@ -45,8 +45,8 @@ class jElocky_place extends eqLogic {
     );
     
     /**
-     * Create a new place or update it if already existing
-     * Place is not saved
+     * Create a new place or return it if already existing.
+     * If created, the object is saved, otherwise not.
      * @param array $place place description as returned by https://elocky.com/fr/doc-api-test#liste-lieu
      * @return jElocky_place
      */
@@ -63,6 +63,7 @@ class jElocky_place extends eqLogic {
             $place_eql->setEqType_name(__CLASS__);
             $place_eql->setLogicalId($place['id']);
             $place_eql->setIsEnable(1);
+            jElockyLog::add('info', 'création lieu ' . $place_eql->getName());
             
             // Save the place directly: required before creating command
             $place_eql->save(true);
@@ -72,50 +73,38 @@ class jElocky_place extends eqLogic {
                 array(
                     jElocky_placeCmd::ALARM_TRIGGERED_ID => array('id' => jElocky_placeCmd::ALARM_TRIGGERED_ID,
                         'stype' => 'binary')), array(jElocky_placeCmd::ALARM_TRIGGERED_ID => 0));
-            
-            jElockyLog::add('info', 'création lieu ' . $place_eql->getName());
         }
-        
-        if ($place_eql->getIsEnable()) {
-            // Place update (configuration and commands)
-            $place_eql->setConfData($place);
-            $place_eql->setCmdData(self::$_cmds_def_matrix, $place);
-        }
-        else {
-            jElockyLog::add('debug', 'place ' . $place_eql->getName() . ' is disabled');
-        }
-                       
+                                      
         jElockyLog::endStep();
         
         return $place_eql;
     }
     
     /**
-     * Update this place information
-     * This place shall be saved after calling this method
+     * Update this place information.
+     * @var boolean $to_save whether or not this place shall be saved after update (true by default)
      * @throws \Exception in case of connexion error with the Elocky server
      */
-    public function update1() {
+    public function update1($to_save=true) {
         $this->startLogStep(__METHOD__);
         if ($this->getIsEnable()) {
-            $this->requestPlaceAndUpdate(false);
+            $this->requestPlaceAndUpdate(true, $to_save);
         }
         jElockyLog::endStep();
     }
     
+    /**
+     * Update this place information
+     * @throws \Exception in case of connexion error with the Elocky server
+     */
     public function update2() {
         $this->startLogStep(__METHOD__);
         if ($this->getIsEnable()) {
-            $this->requestObjectsAndUpdate(false);
+            $this->requestObjectsAndUpdate(true);
         }
         jElockyLog::endStep();
     }
     
-    public function preSave() {
-        $this->startLogStep(__METHOD__);
-        jElockyLog::endStep();
-    }
-
     public function postSave() {
         $this->startLogStep(__METHOD__);
         $this->updatePhoto('requestPlacePhoto');
@@ -143,26 +132,50 @@ class jElocky_place extends eqLogic {
     public static function cronHighFreq() {
         jElockyLog::startStep(__METHOD__);
         foreach (self::byType(__CLASS__, true) as $place_eql) {
-            $place_eql->requestPlaceAndUpdate(true);
-            $place_eql->requestObjectsAndUpdate(true);
+            $place_eql->requestPlaceAndUpdate(false);
+            $place_eql->requestObjectsAndUpdate(false);
         }
         jElockyLog::endStep();
     }
     
     /**
+     * Update this place configuration parameters with the information retrieved from the Elocky server.
+     * This is the responsability of the caller to save the place.
+     * Related commands are not updated (see updateCommands)
+     * @param array $place object data array retrieved from the Elocky server
+     */
+    public function updateConfiguration($place) {
+        if ($this->getIsEnable()) {
+            $this->setMultipleConfiguration(array('address', 'zip_code', 'city', 'photo', 'country'), $place);
+        }
+    }
+    
+    /**
+     * Update this place commands with the information retrieved from the Elocky server.
+     * @param array $place object data array retrieved from the Elocky server
+     */
+    public function updateCommands($place) {
+        if ($this->getIsEnable()) {
+            $this->setCmdData(self::$_cmds_def_matrix, $place);
+        }
+    }
+    
+    /**
      * Add or update a user of this place
      * Update is not saved
-     * @param string $_logicId user eqLogic id
-     * @param string $_state user state (0 = administrateur, 1 = modérateur, 2 = utilisateur, 3 = invité)
-     * @param string $_name name given by the user to this place
+     * @param string $logicId user eqLogic id
+     * @param string $state user state (0 = administrateur, 1 = modérateur, 2 = utilisateur, 3 = invité)
+     * @param string $name name given by the user to this place
      * @param boolean
      */
     public function addUser($id, $state, $name) {
         $users = $this->getConfiguration('users', array());
         $key = jElockyUtil::array_search_ref($users, $id);
         $conf = array('ref' => $id, 'state' => $state, 'name' => $name);
-        if ($key === false)
+        if ($key === false) {
+            jElockyLog::add('info', "l'utilisateur " . $id . " est ajouté au lieu " . $this->getName());
             $users[] = $conf;
+        }
         else
             $users[$key] = $conf;
         
@@ -173,6 +186,34 @@ class jElocky_place extends eqLogic {
     }
     
     /**
+     * Remove a user from this place
+     * Update is not saved
+     * @param string $logicId user eqLogic id
+     * @param boolean
+     */
+    public function removeUser($id) {
+        jElockyLog::add('info', "l'utilisateur " . $id . " est supprimé du lieu " . $this->getName());
+        $users = $this->getConfiguration('users', array());
+        $key = jElockyUtil::array_search_ref($users, $id);
+        if ($key !== false) {
+            unset($users[$key]);
+            $this->setConfiguration('users', $users);
+        }
+
+        if ($this->getConfiguration('admin') == $id)
+            $this->setConfiguration('admin', null);
+    }
+    
+    /**
+     * Return whether or not this place has at least 1 user
+     * @return boolean
+     */
+    public function hasUser() {
+        $users = $this->getConfiguration('users', array());
+        return count($users) > 0 ? true : false;
+    }
+    
+    /**
      * Return objects of this place
      * @return array[jElocky_object] array of the objects of this place
      */
@@ -180,23 +221,45 @@ class jElocky_place extends eqLogic {
         $conf = json_encode(array('place_id' => $this->getId()));
         return self::byTypeAndSearhConfiguration(jElocky_object::class, substr($conf, 1, -1));
     }
+
+    /**
+     * Get an enable user for this place
+     */
+    private function getUser() {
+        $users = $this->getConfiguration('users', array());
+        foreach ($users as $u) {
+            $eql = eqLogic::byId($u['ref']);
+            if (is_object($eql) && $eql->getIsEnable()) {
+                return $eql;
+            }
+        }
+        jElockyLog::add('warning', "aucun utilisateur actif trouvé pour mettre à jour le lieu " . $this->getName());
+        return null;
+    }
     
     /**
      * Get the administrator of this place
-     * @return null|jElocky_user
+     *
+     * @return null|jElocky_user null if administrator is unknown or disabled (a warning message is log if null)
      */
-    public function getAdmin() {
-        $admin_id = $this->getConfiguration('admin', '');
-        return $admin_id == '' ? null : eqLogic::byId($admin_id);
+    private function getAdmin() {
+        if (($admin_id = $this->getConfiguration('admin', '')) != '') {
+            $eql = eqLogic::byId($admin_id);
+            if (is_object($eql) && $eql->getIsEnable()) {
+                return $eql;
+            }
+        }
+        jElockyLog::add('warning', "aucun administrateur actif trouvé pour mettre à jour le lieu " . $this->getName());
+        return null;
     }
     
     /**
      * Return the elocky API object of this place  
-     * @return null|UserAPI null if the admin is unknown or disabled
+     * @return null|UserAPI null if no user is enabled (a warning message is log if null)
      */
-    public function getAPI() {
-        $admin = $this->getAdmin();
-        return isset($admin) ? $admin->getAPI() : null;
+    private function getAPI() {
+        $user = $this->getUser();
+        return isset($user) ? $user->getAPI() : null;
     }
   
     /**
@@ -209,7 +272,7 @@ class jElocky_place extends eqLogic {
         $cron->setClass(__CLASS__);
         $cron->setFunction('resetTriggeredAlarm');
         $cron->setOption(array('id' => $this->getId()));
-        // Add 150s => actual delay between 2 and 3min
+        // Actual delay between 30s and 
         $cron->setSchedule(cron::convertDateToCron(strtotime('now')));
         $cron->setOnce(1);
         $cron->save();
@@ -235,27 +298,30 @@ class jElocky_place extends eqLogic {
      * @throws \Exception in case of communication error with the Elocky server
      */
     public function requestObjects($object_id=-1) {
-        jElockyLog::add('debug', 'requesting ' . ($object_id < 0 ? 'object ' . $object_id : ' objects') .
+        jElockyLog::add('debug', 'requesting ' . ($object_id < 0 ? 'all objects' : 'object ' . $object_id) .
             ' for place ' . $this->getName());
-        $answer = $this->getAPI()->requestObjects($this->getAdmin()->getLogicalId(), $this->getLogicalId())['object'];
-        
-        $objs = array();
-        foreach ($answer[0] as $type => $objects) {
-            foreach ($objects as $object) {
-                // Set object type
-                switch ($type) {
-                    case jElocky_object::KEY_BOARD:
-                        $object[jElocky_object::KEY_TYPE_BOARD] = $object[jElocky_object::KEY_TYPE_BOARD]['id'];
-                        break;
-                    case jElocky_object::KEY_PASSERELLE:
-                        $object[jElocky_object::KEY_TYPE_BOARD] = jElocky_object::ID_PASSERELLE;
-                        break;
+
+        if (($user = $this->getUser()) != null) {
+            $answer = $user->getAPI()->requestObjects($user->getLogicalId(), $this->getLogicalId())['object'];
+            
+            $objs = array();
+            foreach ($answer[0] as $type => $objects) {
+                foreach ($objects as $object) {
+                    // Set object type
+                    switch ($type) {
+                        case jElocky_object::KEY_BOARD:
+                            $object[jElocky_object::KEY_TYPE_BOARD] = $object[jElocky_object::KEY_TYPE_BOARD]['id'];
+                            break;
+                        case jElocky_object::KEY_PASSERELLE:
+                            $object[jElocky_object::KEY_TYPE_BOARD] = jElocky_object::ID_PASSERELLE;
+                            break;
+                    }
+                    
+                    if ($object_id == $object[jElocky_object::KEY_OBJECT_ID])
+                        return $object;
+                        else
+                            $objs[] = $object;
                 }
-                
-                if ($object_id == $object[jElocky_object::KEY_OBJECT_ID])
-                    return $object;
-                    else
-                        $objs[] = $object;
             }
         }
         
@@ -264,53 +330,53 @@ class jElocky_place extends eqLogic {
     
     /**
      * Request data from the Elocky server and update this place information.
-     * This place shall be saved after calling this method if $cmd_only is false
      *
-     * @param bool $cmd_only
-     *            whether or not only commands shall be updated
+     * @param bool $does_update_conf
+     *            whether or not place configuration parameters shall be updated (if not, only commands
+     *            are updated)
+     * @param bool $to_save whether or not this place shall be saved
      * @throws \Exception in case of connexion error with the Elocky server
      */
-    private function requestPlaceAndUpdate($cmd_only) {
-        jElockyLog::add('info', 'updating ' . ($cmd_only ? '' : 'configuration and ') . 'commands of place ' . $this->getName());
-        if (($admin = $this->getAdmin()) != null) {
+    private function requestPlaceAndUpdate($does_update_conf, $to_save=true) {
+        jElockyLog::add('info', 'updating ' . (($does_update_conf ? 'configuration and ' : '')) . 'commands of place ' . $this->getName());
+        if (($user = $this->getUser()) != null) {
             try {
-                $place = $admin->requestPlaces($this->getLogicalId());
+                $place = $user->requestPlaces($this->getLogicalId());
                 if ($place != null) {
-                    if (! $cmd_only) {
-                        $this->setConfData($place);
+                    if ($does_update_conf) {
+                        $this->updateConfiguration($place);
+                        if ($to_save)
+                            $this->save();
                     }
-                    $this->setCmdData(self::$_cmds_def_matrix, $place);
+                    $this->updateCommands(self::$_cmds_def_matrix, $place);
                 }
                 else {
                     jElockyLog::add('warning',
-                        'lieu ' . $this->getName() . '[id=' . $this->getLogicalId() .
-                        "] non trouvé, ou l'administrateur " . $admin->getName() . " est désactivé");
+                        'lieu ' . $this->getName() . '[id=' . $this->getLogicalId() . "] avec l'utilisateur " . $user->getName());
                 }
             } catch (Exception $e) {
                 $this->processElockyException($e->getMessage(), true);
             }
-        }
-        else {
-            jElockyLog::add('warning', 'no admin for place ' . $this->getName());
         }
     }
     
     /**
      * Request objects from the Elocky server and update objects of this place.
      *
-     * @param bool $cmd_only
-     *            whether or not only object commands shall be updated
+     * @param bool $does_update_conf
+     *            whether or not object configuration parameters shall be updated (if not, only commands
+     *            are updated)
      * @throws \Exception in case of connexion error with the Elocky server
      */
-    private function requestObjectsAndUpdate($cmd_only) {
-        jElockyLog::add('info', 'updating ' . ($cmd_only ? '' : 'configuration and ') . 'commands of all objects of place ' . $this->getName());
+    public function requestObjectsAndUpdate($does_update_conf) {
+        jElockyLog::add('info', 'updating ' . ($does_update_conf ? 'configuration and ' : '') . 'commands of all objects of place ' . $this->getName());
         try {
             $objects = $this->requestObjects();
             foreach ($objects as $object) {
                 jElockyLog::add('debug', 'treating object ' . $object['name']);
                 $object_eql = jElocky_object::getInstance($object, $this->getId());
                 $object_eql->updateCommands($object);
-                if (! $cmd_only) {
+                if ($does_update_conf) {
                     $object_eql->updateConfiguration($object);
                     $object_eql->save();
                 }
@@ -320,24 +386,7 @@ class jElocky_place extends eqLogic {
             $this->processElockyException($e->getMessage(), true);
         }
     }
-    
-    /**
-     * Update this place configuration parameters with the information retrieved from the Elocky server
-     * Related commands are not updated (see setPlaceCmdData
-     * @param array $place
-     */
-    private function setConfData($place) {
-        $this->setMultipleConfiguration(array('address', 'zip_code', 'city', 'photo', 'country'), $place);
-    }
-    
-    /**
-     * Update this place command data with the information retrieved from the Elocky server
-     * @param array $place
-     */
-//     private function setCmdData($place) {
-//         $this->setAlarmEnableCmd($place['alarm']);
-//     }
-    
+       
     /**
      * Trigger or reset the alarm
      * @param int|string $value alarm enable status

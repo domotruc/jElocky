@@ -20,6 +20,40 @@ require_once __DIR__ . '/jElockyUtil.class.php';
 trait jElockyEqLogic {
     
     /**
+     * @var boolean
+     */
+    private $_to_update = false;
+    
+    /**
+     * Override setIsEnable to memorize that the eqLogic shall be updated on save
+     * when just enabled. See preSave and postSave.
+     * @param boolean $isEnable
+     * @return boolean
+     */
+    public function setIsEnable($isEnable) {
+        if (!$this->getIsEnable() && $isEnable)
+            $this->_to_update = true;
+            
+        return parent::setIsEnable($isEnable);
+    }
+    
+    public function preSave() {
+        $this->startLogStep(__METHOD__);
+        if ($this->_to_update)
+            $this->update1(false);
+        jElockyLog::endStep();
+    }
+    
+    public function postSave() {
+        $this->startLogStep(__METHOD__);
+        if ($this->_to_update) {
+            $this->update2();
+            $this->_to_update = false;
+        }
+        jElockyLog::endStep();
+    }
+    
+    /**
      * Return the photo pathname of this eqLogic
      * @return string full filename on the jeedom server
      */
@@ -100,16 +134,17 @@ trait jElockyEqLogic {
      * If the photo has changed the $_api_function is called to upload from the Elocky server
      * and saved it in the self::DATA_DIR.
      *
-     * @param string $api_function
+     * @param string $api_func
      *            ElockyAPI\User API method to call to update the photo
      */
-    private function updatePhoto($api_function) {
+    private function updatePhoto($api_func) {
         $photo = $this->getConfiguration('photo', null);
         if (isset($photo)) {
             $f = jElockyUtil::DATA_DIR . '/' . $photo;
             if (! file_exists($f)) {
                 jElockyLog::add('debug', 'loading ' . $this->getName() . "'s photo");
-                call_user_func(array($this->getAPI(), $api_function), $photo, jElockyUtil::DATA_DIR);
+                if (($api = $this->getAPI()) != null)
+                    call_user_func(array($api, $api_func), $photo, jElockyUtil::DATA_DIR);
             }
             else
                 jElockyLog::add('debug', $this->getName() . "'s photo is up to date");

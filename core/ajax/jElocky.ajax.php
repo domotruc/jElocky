@@ -43,9 +43,6 @@ try {
         if (method_exists($eqLogic, $action)) {
             $eqLogic->$action();
         }
-        if ($action == 'update1')
-            $eqLogic->save();
-
         jElockyLog::endStep();
         ajax::success();
     }
