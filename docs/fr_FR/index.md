@@ -7,11 +7,17 @@ Il implémente l'[API mise à disposition par Elocky](https://elocky.com/fr/doc-
 Configuration du plugin 
 ===
 
-Après installation du plugin via le market, l’activer. Renseigner le *Client ID* et le *Client secret* préalablement sollicité auprès de Elocky comme indiqué au début de la [documentation de l'API](https://elocky.com/fr/doc-api-test).
+Après installation du plugin via le market, l’activer.
+
+Renseigner le *Client ID* et le *Client secret*, préalablement sollicité auprès de Elocky, comme indiqué au début de la [documentation de l'API](https://elocky.com/fr/doc-api-test).
 
 
 Utilisateurs
 ===
+
+Dans la page du plugin, que nous trouvons via *Plugins > Sécurité > jElocky*, la première des cjoses à faire est de créer/connecter un nouvel utilisateur.
+
+Cliquer 
 
 Suppression
 ---
@@ -68,6 +74,8 @@ FAQ
 
 En cas d'erreur `{"error":"json_error","error_description":"Syntax error"}`: vérifier le le *Client iD* et *Client secret* dans la configuration du plugin.
 
-# <a name=changelog></a>Registre des évolutions
+<a name=changelog></a>
+
+# Registre des évolutions
 
 
