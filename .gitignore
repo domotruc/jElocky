@@ -8,3 +8,6 @@ Thumbs.db
 *~
 composer.lock
 3rparty/vendor/domotruc/elocky-api/.git
+docs/_site/
+docs/Gemfile.lock
+docs/.sass-cache/
