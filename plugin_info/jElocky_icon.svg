@@ -16,7 +16,7 @@
    version="1.1"
    inkscape:version="0.92.3 (2405546, 2018-03-11)"
    sodipodi:docname="jElocky_icon.svg"
-   inkscape:export-filename="/home/domotruc/docker/dev-jeedom/plugins/jElocky/plugin_info/jElocky_icon.svg.png"
+   inkscape:export-filename="/home/domotruc/docker/dev-jeedom/plugins/jElocky/plugin_info/jElocky_icon.png"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96">
   <defs
@@ -29,7 +29,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.3746772"
-     inkscape:cx="70.330789"
+     inkscape:cx="103.31059"
      inkscape:cy="167.91488"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -107,13 +107,13 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:600;font-stretch:normal;line-height:0%;font-family:'URW Gothic L';-inkscape-font-specification:'URW Gothic L, Semi-Bold';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#f8d800;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="88.866425"
+       x="85.84375"
        y="1045.3553"
        id="text4852"><tspan
          sodipodi:role="line"
          id="tspan4856"
-         x="88.866425"
+         x="85.84375"
          y="1045.3553"
-         style="font-size:37.87434387px;line-height:1.25">jElocky</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:34.66666794px;line-height:1.25;font-family:'Arial Black';-inkscape-font-specification:'Arial Black, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start">jElocky</tspan></text>
   </g>
 </svg>
