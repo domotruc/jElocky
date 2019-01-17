@@ -41,7 +41,7 @@ class jElocky_place extends eqLogic {
     const RIGHT_INVITEE = 3;
     
     private static $_cmds_def_matrix = array(
-        'alarm' => array('id' => jElocky_placeCmd::ALARM_ARMED_ID, 'stype' => 'binary')
+        'alarm' => array('id' => jElocky_placeCmd::ALARM_ARMED_ID, 'stype' => 'binary', 'historizeMode' => 'none')
     );
     
     /**
@@ -57,7 +57,10 @@ class jElocky_place extends eqLogic {
         $place_eql = self::byLogicalId($place['id'], self::class);
         
         // Place creation if necessary
-        if (!is_object($place_eql)) {
+        if (is_object($place_eql)) {
+            jElockyLog::add('debug', 'place ' . $place_eql->getName() . ' exists (id=' . $place_eql->getId() . ')');
+        }
+        else {
             $place_eql = new jElocky_place();
             $place_eql->setName($place['admin_address'][0]['name']);
             $place_eql->setEqType_name(__CLASS__);
@@ -67,12 +70,15 @@ class jElocky_place extends eqLogic {
             
             // Save the place directly: required before creating command
             $place_eql->save(true);
+            
+            // Inform the UI that a place has been added
+            event::add('jElocky::insert', array('eqlogic_type' => $place_eql->getEqType_name(), 'eqlogic_name' => $place_eql->getName()));
 
             // Create the alarm triggered command which can be only set through IFTTT
             $place_eql->setCmdData(
                 array(
                     jElocky_placeCmd::ALARM_TRIGGERED_ID => array('id' => jElocky_placeCmd::ALARM_TRIGGERED_ID,
-                        'stype' => 'binary')), array(jElocky_placeCmd::ALARM_TRIGGERED_ID => 0));
+                        'stype' => 'binary', 'historizeMode' => 'none')), array(jElocky_placeCmd::ALARM_TRIGGERED_ID => 0));
         }
                                       
         jElockyLog::endStep();
@@ -87,7 +93,7 @@ class jElocky_place extends eqLogic {
      */
     public function update1($to_save=true) {
         $this->startLogStep(__METHOD__);
-        if ($this->getIsEnable()) {
+        if ($this->getIsEnable() && !$this->getIsLocked()) {
             $this->requestPlaceAndUpdate(true, $to_save);
         }
         jElockyLog::endStep();
@@ -99,7 +105,7 @@ class jElocky_place extends eqLogic {
      */
     public function update2() {
         $this->startLogStep(__METHOD__);
-        if ($this->getIsEnable()) {
+        if ($this->getIsEnable() && !$this->getIsLocked()) {
             $this->requestObjectsAndUpdate(true);
         }
         jElockyLog::endStep();
@@ -117,6 +123,7 @@ class jElocky_place extends eqLogic {
      */
     public function preRemove() {
         $this->startLogStep(__METHOD__);
+        $this->setIsLocked(true);
         jElockyLog::add('info', 'suppression lieu ' . $this->getName() . ' (id=' . $this->getId() . ')');
         $objects = $this->getObjects();
         foreach ($objects as $object) {
@@ -124,7 +131,7 @@ class jElocky_place extends eqLogic {
         }
         jElockyLog::endStep();
     }
-    
+
     /**
      * Update data that shall be updated frequently
      * (only commands are updated)
@@ -132,8 +139,12 @@ class jElocky_place extends eqLogic {
     public static function cronHighFreq() {
         jElockyLog::startStep(__METHOD__);
         foreach (self::byType(__CLASS__, true) as $place_eql) {
-            $place_eql->requestPlaceAndUpdate(false);
-            $place_eql->requestObjectsAndUpdate(false);
+            if ($place_eql->getIsEnable() && ! $place_eql->getIsLocked())
+                $place_eql->requestPlaceAndUpdate(false);
+            
+            // Test done each time in case the place is disabled in between
+            if ($place_eql->getIsEnable() && ! $place_eql->getIsLocked())
+                $place_eql->requestObjectsAndUpdate(false);
         }
         jElockyLog::endStep();
     }
@@ -145,7 +156,7 @@ class jElocky_place extends eqLogic {
      * @param array $place object data array retrieved from the Elocky server
      */
     public function updateConfiguration($place) {
-        if ($this->getIsEnable()) {
+        if ($this->getIsEnable() && !$this->getIsLocked()) {
             $this->setMultipleConfiguration(array('address', 'zip_code', 'city', 'photo', 'country'), $place);
         }
     }
@@ -155,7 +166,7 @@ class jElocky_place extends eqLogic {
      * @param array $place object data array retrieved from the Elocky server
      */
     public function updateCommands($place) {
-        if ($this->getIsEnable()) {
+        if ($this->getIsEnable()&& !$this->getIsLocked()) {
             $this->setCmdData(self::$_cmds_def_matrix, $place);
         }
     }
@@ -223,14 +234,17 @@ class jElocky_place extends eqLogic {
     }
 
     /**
-     * Get an enable user for this place
+     * Get an enable user (enable and not locked) for this place
+     * A warning is logged if no user is found
+     * @return jElocky_user|null
      */
     private function getUser() {
         $users = $this->getConfiguration('users', array());
         foreach ($users as $u) {
-            $eql = eqLogic::byId($u['ref']);
-            if (is_object($eql) && $eql->getIsEnable()) {
-                return $eql;
+            /* @var jElocky_user $eqU */
+            $eqU = eqLogic::byId($u['ref']);
+            if (is_object($eqU) && $eqU->getIsEnable() && !$eqU->getIsLocked()) {
+                return $eqU;
             }
         }
         jElockyLog::add('warning', "aucun utilisateur actif trouvé pour mettre à jour le lieu " . $this->getName());
@@ -239,14 +253,16 @@ class jElocky_place extends eqLogic {
     
     /**
      * Get the administrator of this place
+     * A warning is logged if no administrator is found
      *
      * @return null|jElocky_user null if administrator is unknown or disabled (a warning message is log if null)
      */
     private function getAdmin() {
         if (($admin_id = $this->getConfiguration('admin', '')) != '') {
-            $eql = eqLogic::byId($admin_id);
-            if (is_object($eql) && $eql->getIsEnable()) {
-                return $eql;
+            /* @var jElocky_user $eqU */
+            $eqU = eqLogic::byId($admin_id);
+            if (is_object($eqU) && $eqU->getIsEnable() && !$eqU->getIsLocked()) {
+                return $eqU;
             }
         }
         jElockyLog::add('warning', "aucun administrateur actif trouvé pour mettre à jour le lieu " . $this->getName());
@@ -292,17 +308,20 @@ class jElocky_place extends eqLogic {
      * Request and return all the object of this place, or the specified one if $object_id is provided.
      *
      * If $object_id < 0:
-     *    Return an array of objects
+     *    Return an array of objects (an empty array if this place does not have objects)
      * @param int $object_id id of the specific object to retrieve, -1 (default) to retrieve all objects
-     * @return array|null null if the place is not enabled or the given object_id is not found
+     * @return array|null
+     *     null if this place is not enabled or the given object_id is not found (when positive)
+     *     empty array if this place does not contain any objects
      * @throws \Exception in case of communication error with the Elocky server
      */
     public function requestObjects($object_id=-1) {
         jElockyLog::add('debug', 'requesting ' . ($object_id < 0 ? 'all objects' : 'object ' . $object_id) .
             ' for place ' . $this->getName());
 
-        if (($user = $this->getUser()) != null) {
-            $answer = $user->getAPI()->requestObjects($user->getLogicalId(), $this->getLogicalId())['object'];
+        $objs = null;
+        if (($user = $this->getUser()) != null && ($api = $user->getAPI()) != null) {
+            $answer = $api->requestObjects($user->getLogicalId(), $this->getLogicalId())['object'];
             
             $objs = array();
             foreach ($answer[0] as $type => $objects) {
@@ -319,8 +338,8 @@ class jElocky_place extends eqLogic {
                     
                     if ($object_id == $object[jElocky_object::KEY_OBJECT_ID])
                         return $object;
-                        else
-                            $objs[] = $object;
+                    else
+                        $objs[] = $object;
                 }
             }
         }
@@ -340,12 +359,13 @@ class jElocky_place extends eqLogic {
     private function requestPlaceAndUpdate($does_update_conf, $to_save=true) {
         jElockyLog::add('info', 'updating ' . (($does_update_conf ? 'configuration and ' : '')) . 'commands of place ' . $this->getName());
         if (($user = $this->getUser()) != null) {
+            /** @var jElocky_user $user */
             try {
                 $place = $user->requestPlaces($this->getLogicalId());
                 if ($place != null) {
                     if ($does_update_conf) {
                         $this->updateConfiguration($place);
-                        if ($to_save)
+                        if ($to_save && !$this->getIsLocked())
                             $this->save();
                     }
                     $this->updateCommands(self::$_cmds_def_matrix, $place);
@@ -371,16 +391,24 @@ class jElocky_place extends eqLogic {
     public function requestObjectsAndUpdate($does_update_conf) {
         jElockyLog::add('info', 'updating ' . ($does_update_conf ? 'configuration and ' : '') . 'commands of all objects of place ' . $this->getName());
         try {
-            $objects = $this->requestObjects();
-            foreach ($objects as $object) {
-                jElockyLog::add('debug', 'treating object ' . $object['name']);
-                $object_eql = jElocky_object::getInstance($object, $this->getId());
-                $object_eql->updateCommands($object);
-                if ($does_update_conf) {
-                    $object_eql->updateConfiguration($object);
-                    $object_eql->save();
+            if (($objects = $this->requestObjects()) !== null) {
+                foreach ($objects as $object) {
+                    jElockyLog::add('debug', 'treating object ' . $object['name']);
+                    $object_eql = jElocky_object::getInstance($object, $this->getId());
+                    if ($object_eql != null) {
+                        $object_eql->updateCommands($object);
+                        if ($does_update_conf) {
+                            $object_eql->updateConfiguration($object);
+                            $object_eql->save();
+                        }
+                    }
+                    else {
+                        jElockyLog::add('info', 'nothing done as related place ' . $this->getId() . ' is locked');
+                    }
                 }
             }
+            else
+                jElockyLog::add('warning', "le lieu " . $this->getName() . " est inactif : impossible de mettre à jour ses objets");
         }
         catch (Exception $e) {
             $this->processElockyException($e->getMessage(), true);

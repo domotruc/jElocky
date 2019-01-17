@@ -53,34 +53,35 @@ class jElocky_object extends eqLogic {
     private static $_cmds_def_matrix = array(
         // Passerelle
         array(
-            'nbObject' => array('id' => 'nbObject', 'stype' => 'numeric'),
-            'connectionInternet' => array('id' => 'connectionInternet', 'stype' => 'numeric'),
+            'nbObject' => array('id' => 'nbObject', 'stype' => 'numeric', 'historizeMode' => 'none'),
+            'connectionInternet' => array('id' => 'connectionInternet', 'stype' => 'binary', 'historizeMode' => 'none'),
             'address_ip' => array('id' => 'address_ip', 'stype' => 'string'),
-            'state' => array('id' => 'state', 'stype' => 'numeric'),
+            'state' => array('id' => 'state', 'stype' => 'binary', 'historizeMode' => 'none'),
             'vpn' => array('id' => 'vpn', 'stype' => 'string'),
             'address_ip_local' => array('id' => 'address_ip_local', 'stype' => 'string')
         ),
         // Serrure
         array(
-            'nbAccess' => array('id' => 'nbAccess', 'stype' => 'numeric'),
+            'nbAccess' => array('id' => 'nbAccess', 'stype' => 'numeric', 'historizeMode' => 'none'),
             'battery' => array('id' => 'battery', 'stype' => 'numeric', 'unit' => '%'),
             'version' => array('id' => 'version', 'stype' => 'string'),
-            'veille' => array('id' => 'veille', 'stype' => 'numeric'),
-            'connection' => array('id' => 'connection', 'stype' => 'numeric'),
-            'programme' => array('id' => 'programme', 'stype' => 'numeric'),
+            'veille' => array('id' => 'veille', 'stype' => 'numeric', 'historizeMode' => 'none'),
+            'connection' => array('id' => 'connection', 'stype' => 'numeric', 'historizeMode' => 'none'),
+            'programme' => array('id' => 'programme', 'stype' => 'numeric', 'historizeMode' => 'none'),
             'tension' => array('id' => 'tension', 'stype' => 'numeric', 'process' => array(self::class, 'convertVoltage'), 'unit' => 'V'),
-            'maj' => array('id' => 'maj', 'stype' => 'numeric'),
-            'reveille' => array('id' => 'reveille', 'stype' => 'numeric'),
+            'maj' => array('id' => 'maj', 'stype' => 'numeric', 'historizeMode' => 'none'),
+            'reveille' => array('id' => 'reveille', 'stype' => 'numeric', 'historizeMode' => 'none'),
             'date_battery' => array('id' => 'date_battery', 'stype' => 'string')
         )
     );
     
     /**
-     * Create a new object or return it if already existing.
+     * Create a new object belonging to the given place or return it if already existing.
      * If created, the object is saved.
+     * If the given place is locked, null is return
      * @param array $object object data as returned by https://elocky.com/fr/doc-api-test#liste-objets
      * @param array $place_id jeedom id of the place where is located the object
-     * @return jElocky_object
+     * @return jElocky_object|null return null if 
      */
     public static function getInstance($object, $place_id) {
         
@@ -90,6 +91,7 @@ class jElocky_object extends eqLogic {
         // Object creation if necessary
         if (is_object($object_eql)) {
             jElockyLog::add('debug', 'object ' . $object_eql->getName() . ' exists (id=' . $object_eql->getId() . ')');
+            $is_created = false;
         }
         else {
             $type = self::TYPES[$object[self::KEY_TYPE_BOARD]];
@@ -105,12 +107,21 @@ class jElocky_object extends eqLogic {
                 $object_eql->setConfiguration('battery_type', '1x3.6V ER14250');
             }
             
-            // Save the place directly: required before creating command
-            $object_eql->save(true);
-                       
-            jElockyLog::add('info', 'creating object ' . $object_eql->getName() . ' of type ' . $type);
+            jElockyLog::add('info', 'creation object ' . $object_eql->getName() . ' de type ' . $type);
+            $is_created = true;
         }
-         
+
+        if (jElocky_place::getIsLockedById($place_id))
+            return null;
+
+        if ($is_created) {
+            // Save the created object
+            $object_eql->save(true);
+            
+            // Inform the UI that a place has been added
+            event::add('jElocky::insert', array('eqlogic_type' => $object_eql->getEqType_name(), 'eqlogic_name' => $object_eql->getName()));
+        }
+        
         return $object_eql;
     }
     
@@ -125,11 +136,14 @@ class jElocky_object extends eqLogic {
         if ($this->getIsEnable()) {
             /* @var jElocky_place $place_eql*/
             $place_eql = jElocky_place::byId($this->getConfiguration('place_id'));
-            $object = $place_eql->requestObjects($this->getLogicalId());
-            $this->updateConfiguration($object);
-            $this->updateCommands($object);
-            if ($to_save)
-                $this->save(true);
+            if (($object = $place_eql->requestObjects($this->getLogicalId())) != null) {
+                $this->updateConfiguration($object);
+                $this->updateCommands($object);
+                if ($to_save)
+                    $this->save(true);
+            }
+            else
+                jElockyLog::add('warning', "aucun lieu actif trouvé pour mettre à jour l'objet " . $this->getName());
         }
         
         jElockyLog::endStep();
@@ -147,7 +161,7 @@ class jElocky_object extends eqLogic {
         jElockyLog::add('info', 'suppression objet ' . $this->getName() . ' (id=' . $this->getId() . ')');
         jElockyLog::endStep();
     }
-    
+       
     /**
      * Return the photo pathname of this jElocky_object
      * @return string full filename on the jeedom server

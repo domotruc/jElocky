@@ -25,8 +25,7 @@ trait jElockyEqLogic {
     private $_to_update = false;
     
     /**
-     * Override setIsEnable to memorize that the eqLogic shall be updated on save
-     * when just enabled. See preSave and postSave.
+     * Override setIsEnable to memorize that the eqLogic shall be updated on save when just enabled. See preSave and postSave.
      * @param boolean $isEnable
      * @return boolean
      */
@@ -37,6 +36,35 @@ trait jElockyEqLogic {
         return parent::setIsEnable($isEnable);
     }
     
+    
+    /**
+     * Lock this object. Lock status is memorized in the cache only.
+     * @param bool $isLocked
+     */
+    public function setIsLocked($isLocked) {
+        $this->setCache('isLocked', $isLocked);
+    }
+    
+    
+    /**
+     * Return whether or not this jElockyEqLogic is locked.
+     * @return bool
+     */
+    public function getIsLocked() {
+        return $this->getCache('isLocked', false);
+    }
+    
+    /**
+     * Return whether or not the given jElockyEqLogic object is locked.
+     * It is an efficient way to retrieve the lock status if only its id is known
+     * @param int $id
+     * @return bool
+     */
+    public static function getIsLockedById($id) {
+        $eql = new eqLogic();
+        return $eql->setId($id)->getCache('isLocked', false);
+    }
+      
     public function preSave() {
         $this->startLogStep(__METHOD__);
         if ($this->_to_update)
@@ -115,6 +143,8 @@ trait jElockyEqLogic {
                     $cmd->setIsVisible(1);
                     if (key_exists('unit', $def))
                         $cmd->setUnite($def['unit']);
+                    if (key_exists('historizeMode', $def))
+                        $cmd->setConfiguration('historizeMode', $def['historizeMode']);
                     $cmd->save();    
                 }
                 $val = key_exists('process', $def) ? call_user_func($def['process'], $data[$key]) : $data[$key];

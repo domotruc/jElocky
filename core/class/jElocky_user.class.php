@@ -55,7 +55,7 @@ class jElocky_user extends eqLogic implements LoggerInterface {
                     $userProfile);
                 $this->setLogicalId($userProfile['reference']);
                 $this->updateAPI();
-                if ($to_save)
+                if ($to_save && !$this->getIsLocked())
                     $this->save();
             } catch (\Exception $e) {
                 $this->processElockyException($e->getMessage(), true);
@@ -72,7 +72,7 @@ class jElocky_user extends eqLogic implements LoggerInterface {
      */
     public function update2() {
         $this->startLogStep(__METHOD__);
-        if ($this->getIsEnable()) {
+        if ($this->getIsEnable() && !$this->getIsLocked()) {
             try {
                 foreach ($this->requestPlaces() as $place) {
                     jElockyLog::add('debug', 'treating place ' . $place['admin_address'][0]['name']);
@@ -82,7 +82,8 @@ class jElocky_user extends eqLogic implements LoggerInterface {
                     $place_eql->updateConfiguration($place);
                     $place_eql->updateCommands($place);
                     $place_eql->requestObjectsAndUpdate(true);
-                    $place_eql->save();
+                    if (!$place_eql->getIsLocked())
+                        $place_eql->save();
                 }
                 
                 // Update the user photo if needed
@@ -102,6 +103,7 @@ class jElocky_user extends eqLogic implements LoggerInterface {
      */
     public function preRemove() {
         $this->startLogStep(__METHOD__);
+        $this->setIsLocked(true);
         jElockyLog::add('info', 'suppression utilisateur ' . $this->getName() . ' (id=' . $this->getId() . ')');
         $places = $this->getPlaces();
         foreach ($places as $place) {
@@ -111,6 +113,7 @@ class jElocky_user extends eqLogic implements LoggerInterface {
                 $place->remove();
         }
         jElockyLog::endStep();
+        return true;
     }
     
     /**
@@ -143,7 +146,7 @@ class jElocky_user extends eqLogic implements LoggerInterface {
      * @return null|UserAPI null if this user is not enabled
      */
     public function getAPI() {
-        if (! $this->getIsEnable())
+        if (! $this->getIsEnable() || $this->getIsLocked())
             return null;
         
         if (isset($this->_api))
@@ -176,7 +179,7 @@ class jElocky_user extends eqLogic implements LoggerInterface {
         
         $api = $this->getAPI();
         if ($api !== null) {
-            $places = $this->getAPI()->requestPlaces()['lieux'];
+            $places = $api->requestPlaces()['lieux'];
             if ($place_id < 0)
                 return $places;
                 
