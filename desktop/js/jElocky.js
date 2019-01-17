@@ -1,3 +1,4 @@
+var refreshTimeout = undefined;
 
 /* This file is part of Jeedom.
  *
@@ -30,7 +31,7 @@ function initPluginUrl(_filter=['id','saveSuccessFull','removeSuccessFull']) {
     return 'index.php?' + url;
 }
 
-$(document).ready(function() {
+//$(document).ready(function() {
     $('.eqLogicAttr[data-l1key=configuration][data-l2key=photo]').on('change', function () {
         if($(this).value() != '' && $('.li_eqLogic.active').attr('data-eqlogic_id') != '') {
             $('.eqLogic:visible #photo_place,#photo_user').attr("src", DATA_DIR + "/" + $(this).value());
@@ -41,7 +42,10 @@ $(document).ready(function() {
             $('.eqLogic:visible #photo_object').attr("src", "plugins/jElocky/resources/" + $(this).value() + '.png');
         }
     });
-});
+//    $('.li_eqLogic.active').attr('data-eqlogic_id') != '') {
+//        
+//    }
+//});
 
 //Override plugin template to rewrite the URL to avoid keeping the successfull save message
 if (getUrlVars('saveSuccessFull') == 1) {
@@ -133,6 +137,36 @@ $('.eqLogic a[data-toggle=tab]').on('click', function () {
             });
         }
     });
+});
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+$('body').off('jElocky::insert').on('jElocky::insert', function (_event,_options) {
+
+    var msg = '{{L\'équipement}} <b>' + _options['eqlogic_name'] + '</b> {{vient d\'être inclu}}';
+
+    // If the page is being modified or an equipment is being consulted or a dialog box is shown: display a simple alert message
+    // Otherwise: display an alert message and reload the page
+    if (modifyWithoutSave || $('div[role="dialog"]').filter(':visible').length != 0) {
+        $('#div_newEqptMsg').showAlert({
+            message: msg + '. {{Réactualiser la page}}.',
+            level: 'warning'});
+    }
+    else {
+        $('#div_newEqptMsg').showAlert({
+            message: msg + '. {{La page va se réactualiser automatiquement}}.',
+            level: 'warning'
+        });
+        // Reload the page after a delay to let the user read the message
+        if (refreshTimeout === undefined) {
+            console.log('refresh is sheduled');
+            refreshTimeout = setTimeout(function() {
+                refreshTimeout = undefined;
+                console.log('refresh');
+                window.location.reload();
+            }, 2000);
+        }
+    }
 });
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

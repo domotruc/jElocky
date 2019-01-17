@@ -55,6 +55,7 @@ function displayEqLogicCard($_eqLogic) {
 
 ?>
 
+<div id="div_newEqptMsg"></div>
 <div class="row row-overflow">
     <div class="col-lg-2 col-md-3 col-sm-4">
         <div class="bs-sidebar">

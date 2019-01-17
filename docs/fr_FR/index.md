@@ -1,7 +1,7 @@
 Présentation 
 ===
 
-Le plugin jElocky interface les équipements de la marque [Elocky](https://elocky.com/) (serrure eVy, box eZy, beacon) avec Jeedom
+Le plugin jElocky interface les équipements de la marque [Elocky](https://elocky.com/) (serrure eVy, box eZy, beacon) avec Jeedom.
 Il implémente l'[API mise à disposition par Elocky](https://elocky.com/fr/doc-api-test).
 
 Configuration du plugin 
@@ -15,11 +15,19 @@ Renseigner le *Client ID* et le *Client secret*, préalablement sollicité aupr�
 Utilisateurs
 ===
 
-Dans la page du plugin, que nous trouvons via *Plugins > Sécurité > jElocky*, la première des cjoses à faire est de créer/connecter un nouvel utilisateur.
+Ajout d'un utilisateur
+---
 
-Cliquer 
+Dans la page du plugin, accessible via *Plugins > Sécurité > jElocky*, commencer par connecter un nouvel utilisateur en cliquant sur le bouton pour se faire.
 
-Suppression
+Renseigner le nom du nouvel utilisateur dans la boite de dialogue. Ce nom est propre au plugin jElocky.
+
+La page de l'utilisateur s'affiche, renseigner son courriel et son mot de passe, activer le et sauvegarder. Après quelques secondes, le temps d'interroger les serveurs Elocky, les informations de l'utilisateurs s'affichent () ; les lieux et objets associés sont automatiquement ajoutés.
+
+> **Note**
+> Il n'est pour le moment pas possible de créer un nouvel utilisateur via le plugin : il faut l'avoir préalablement créé dans l'application mobile Elocky.
+
+Suppression d'un utilisateur
 ---
 
 
@@ -74,8 +82,10 @@ FAQ
 
 En cas d'erreur `{"error":"json_error","error_description":"Syntax error"}`: vérifier le le *Client iD* et *Client secret* dans la configuration du plugin.
 
-<a name=changelog></a>
 
-# Registre des évolutions
+<a id="changelog"></a>
+
+Registre des évolutions
+===
 
 
