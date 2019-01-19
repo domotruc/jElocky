@@ -51,31 +51,42 @@ Mise à jour
 API
 ===
 
-L'URL de base commune à toutes les requêtes API est:
- 
-    http://#IP_JEEDOM#/plugins/jElocky/core/api/jeeElocky.php?apikey=#APIKEY#
-    
-`#APIKEY#` est la clef API jElocky que l'on trouve dans la page de *Configuration* de Jeedom, onglet *API*.
+Le plugin jElocky est accessible via l'[API HTTP](https://jeedom.github.io/core/fr_FR/api_http) du core de Jeedom.
+
+Dans la suite de ce chapitre:
+
+* `#IP_JEEDOM#` est l'url d’accès à Jeedom. Il s’agit (sauf si connection via le réseau local) de l’adresse internet permettant d'accéder à Jeedom depuis l’extérieur.
+*  `#APIKEY#` est la clef API jElocky qui se trouve dans la page de *Configuration* de Jeedom, onglet *API*.
 
 Test de l'API
 ---
 
-L'URL est:
+Pour tester l'accès à l'API:
 
-    http://#IP_JEEDOM#/plugins/jElocky/core/api/jeeElocky.php?apikey=#APIKEY#&action=test
+    http://#IP_JEEDOM#/core/api/jeeApi.php?apikey=#APIKEY#&type=jElocky&action=test
 
-Retourne *OK* si la configuration est correcte.
+Retourne la date courante et OK si ca fonctionne.
 
 Déclencher l'alarme d'un lieu
 ---
 
 L'URL est:
 
-`http://#IP_JEEDOM#/plugins/jElocky/core/api/jeeElocky.php?apikey=#APIKEY#&action=trig_alarm&id=#ID#`
+    http://#IP_JEEDOM#/core/api/jeeApi.php?apikey=#APIKEY#&type=jElocky&action=trig_alarm&id=#ID#
 
-où #ID# est l'id du lieu.
+où #ID# est l'id du lieu pour lequel nous souhaitons déclencher l'alarme.
 
+Cet API permet de récuperer l'évènement IFTTT de déclenchement de l'alarme d'un lieu. Pour celà, il faut:
 
+* créer l'évènement IFTTT correspondant dans l'application mobile Elocky;
+* et créer une applet IFTTT du type:
+
+    if Webhooks(Receive a web request) then Webhooks(Make a web request)
+
+où:
+
+* `Webhooks(Receive a web request)` reçoit l'évènement défini dans l'appli mobile jElocky;
+* `Webhooks(Make a web request)` active l'URL objet de ce paragraphe.
 
 FAQ
 ===

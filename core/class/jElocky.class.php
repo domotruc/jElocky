@@ -39,6 +39,41 @@ class jElocky extends eqLogic {
 //         jElockyLog::endStep();        
 //     }
     
+    
+    /**
+     * @throws Exception if 
+     */
+    public static function event() {
+        jElockyLog::add('debug', 'API::$_GET=' . json_encode($_GET));
+        if (init('action') == 'test') {
+            log::add('jElocky', 'info', 'API::tested ok from ' . getClientIp());
+            echo date('r') . ' OK';
+            return;
+        }
+        
+        if (init('action') == 'trig_alarm') {
+            /* @var jElocky_place $eql */
+            $eql = jElocky_place::byId(init('id'));
+            
+            if (!is_object($eql)) {
+                throw new Exception('API::trig_alarm::' . __('aucun lieu ne correspond à l\'id', __FILE__) . ' ' . secureXSS(init('id')));
+            }
+            if ($eql->getEqType_name() != jElocky_place::class) {
+                throw new Exception('API::trig_alarm::id=' . secureXSS(init('id')) . ' ' . __("n'est pas un lieu", __FILE__));
+            }
+            
+            if ($eql->getIsEnable())
+                $eql->triggerAlarm();
+            else
+                throw new Exception('API::trig_alarm::' . __('lieu', __FILE__) . ' ' . $eql->getName() . ' ' . __('est inhibé', __FILE__) .
+                    ' (id=' . secureXSS(init('id')) . ')');
+                
+            return;
+        }
+        
+        throw new Exception('API::' . __("action non définie ou inconnue", __FILE__));
+    }
+    
     /*
      * Fonction exécutée automatiquement toutes les minutes par Jeedom
      */
