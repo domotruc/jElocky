@@ -72,7 +72,7 @@ Déclencher l'alarme d'un lieu
 
 L'URL est:
 
-    http://#IP_JEEDOM#/core/api/jeeApi.php?apikey=#APIKEY#&type=jElocky&action=trig_alarm&id=#ID#
+    http://#IP_JEEDOM#/core/api/jeeApi.php?apikey=#APIKEY#&type=jElocky&action=trigger_alarm&id=#ID#
 
 où #ID# est l'id du lieu pour lequel nous souhaitons déclencher l'alarme.
 

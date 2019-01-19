@@ -139,7 +139,7 @@ function displayEqLogicCard($_eqLogic) {
 
             echo '<div class="tab-content"><br>';
             $active = ' in active';
-            /* @var jElocky_user $eqU */
+            /* @var jElocky_place $eqP */
             foreach ($eqPlaces as $eqP) {
                 echo '<div id="' . $eqP->getId() . '" class="tab-pane fade' . $active . '">';
                 displayEqLogicCard($eqP);

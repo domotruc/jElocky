@@ -51,21 +51,21 @@ class jElocky extends eqLogic {
             return;
         }
         
-        if (init('action') == 'trig_alarm') {
+        if (init('action') == 'trigger_alarm') {
             /* @var jElocky_place $eql */
             $eql = jElocky_place::byId(init('id'));
             
             if (!is_object($eql)) {
-                throw new Exception('API::trig_alarm::' . __('aucun lieu ne correspond à l\'id', __FILE__) . ' ' . secureXSS(init('id')));
+                throw new Exception('API::trigger_alarm::' . __('aucun lieu ne correspond à l\'id', __FILE__) . ' ' . secureXSS(init('id')));
             }
             if ($eql->getEqType_name() != jElocky_place::class) {
-                throw new Exception('API::trig_alarm::id=' . secureXSS(init('id')) . ' ' . __("n'est pas un lieu", __FILE__));
+                throw new Exception('API::trigger_alarm::id=' . secureXSS(init('id')) . ' ' . __("n'est pas un lieu", __FILE__));
             }
             
             if ($eql->getIsEnable())
                 $eql->triggerAlarm();
             else
-                throw new Exception('API::trig_alarm::' . __('lieu', __FILE__) . ' ' . $eql->getName() . ' ' . __('est inhibé', __FILE__) .
+                throw new Exception('API::trigger_alarm::' . __('lieu', __FILE__) . ' ' . $eql->getName() . ' ' . __('est inhibé', __FILE__) .
                     ' (id=' . secureXSS(init('id')) . ')');
                 
             return;
