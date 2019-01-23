@@ -24,8 +24,6 @@ require_once __DIR__ . '/jElockyLog.class.php';
 require_once 'ElockyAPILogger.trait.php';
 require_once 'jElockyEqLogic.trait.php';
 
-use ElockyAPI\User as UserAPI;
-
 /**
  * @author domotruc
  *

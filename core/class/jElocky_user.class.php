@@ -82,8 +82,10 @@ class jElocky_user extends eqLogic implements LoggerInterface {
                     $place_eql->updateConfiguration($place);
                     $place_eql->updateCommands($place);
                     $place_eql->requestObjectsAndUpdate(true);
-                    if (!$place_eql->getIsLocked())
+                    if (!$this->getIsLocked() && !$place_eql->getIsLocked())
                         $place_eql->save();
+                    else
+                        jElockyLog::add('debug', 'user or place is locked: place ' . $place['admin_address'][0]['name'] . ' is not saved');
                 }
                 
                 // Update the user photo if needed

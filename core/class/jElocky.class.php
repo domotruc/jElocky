@@ -83,7 +83,7 @@ class jElocky extends eqLogic {
         if (cache::byKey('plugin::cronHourly::inprogress')->getValue() == 0 ||
             cache::byKey('plugin::cronHourly::last')->getValue() != __CLASS__) {
             jElocky_place::cronHighFreq();
-            }
+        }
         else {
             jElockyLog::add('debug', 'cronHourly is running: exit');
         }

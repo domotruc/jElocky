@@ -4,6 +4,13 @@ Présentation
 Le plugin jElocky interface les équipements de la marque [Elocky](https://elocky.com/) (serrure eVy, box eZy, beacon) avec Jeedom.
 Il implémente l'[API mise à disposition par Elocky](https://elocky.com/fr/doc-api-test).
 
+Les fonctionalités disponibles sont:
+
+
+> **Note:**
+> 
+> Le plugin récupère les information du serveur Elocky, il n'a pas (encore) la capacité de les modifier. Donc la configuration des utilisateurs/lieux/objets doit continuer à se faire avec l'application mobile Elocky.
+
 Configuration du plugin 
 ===
 
@@ -22,24 +29,48 @@ Dans la page du plugin, accessible via *Plugins > Sécurité > jElocky*, commenc
 
 Renseigner le nom du nouvel utilisateur dans la boite de dialogue. Ce nom est propre au plugin jElocky.
 
-La page de l'utilisateur s'affiche, renseigner son courriel et son mot de passe, activer le et sauvegarder. Après quelques secondes, le temps d'interroger les serveurs Elocky, les informations de l'utilisateurs s'affichent () ; les lieux et objets associés sont automatiquement ajoutés.
+La page de l'utilisateur s'affiche, renseigner son courriel et son mot de passe, activer le et sauvegarder. Après quelques secondes, le temps d'interroger les serveurs Elocky, les données de l'utilisateurs s'affichent ; les lieux et objets associés sont automatiquement ajoutés et la page est raffraichie si nécessaire.
 
-> **Note**
+> **Note:**
+>
 > Il n'est pour le moment pas possible de créer un nouvel utilisateur via le plugin : il faut l'avoir préalablement créé dans l'application mobile Elocky.
+
+Données utilisateur et mise à jour
+---
+
+Les données de l'utilisateur sont Nom, Prénom, Téphone et Date de création.
+
+Elles sont synchronisées avec le serveur Elocky à l'ouverture de la page utilisateur, ainsi que toutes les heures, à condition que l'utilisateur soit bien activé.
 
 Suppression d'un utilisateur
 ---
 
+Depuis la page du plugin, cliquer sur l'utilisateur à supprimer, puis sur le bouton *Supprimer* en haut à droite de l'interface.
 
+Serons supprimés:
 
-Mise à jour
----
+* L'utilisateur;
+* Les lieux de l'utilisateur si ces derniers se retrouvent orphelins (i.e. si ils n'ont plus aucun autre utilisateur défini dans Jeedom);
+* Les objets appartenant aux lieux supprimés.
+
+> **Note:**
+>
+> Les éléments ne sont supprimés que sur Jeedom : rien n'est supprimé côté serveur Elocky.
+
 
 Lieux
 ===
 
-Mise à jour
+Les lieux sont automatiquement crées : lorsqu'un utilisateur est ajouté, ses lieux le sont également.
+
+Dans la page du plugin, accessible via *Plugins > Sécurité > jElocky*, cliquer sur la carte d'un lieu pour afficher ses données.
+
+Données de lieux et mise à jour
 ---
+
+L'onglet **Informations** affiche les données d'adresse du lieu. Ces dernières sont synchronisées avec le serveur Elocky à l'ouverture de la page du lieu ainsi que toutes les heures, à condition que le lieu soit activé et qu'il appartienne à un utilisateur activé.
+
+L'onglet **Commandes** affiche to
 
 Objets
 ===
@@ -76,10 +107,10 @@ L'URL est:
 
 où #ID# est l'id du lieu pour lequel nous souhaitons déclencher l'alarme.
 
-Cet API permet de récuperer l'évènement IFTTT de déclenchement de l'alarme d'un lieu. Pour celà, il faut:
+Cet API permet de récuperer l'évènement IFTTT de déclenchement de l'alarme d'un lieu. Pour celà, il faut créer:
 
-* créer l'évènement IFTTT correspondant dans l'application mobile Elocky;
-* et créer une applet IFTTT du type:
+* L'évènement IFTTT correspondant dans l'application mobile Elocky; et
+* Une applet côté IFTTT du type:
 
     if Webhooks(Receive a web request) then Webhooks(Make a web request)
 

@@ -31,21 +31,16 @@ function initPluginUrl(_filter=['id','saveSuccessFull','removeSuccessFull']) {
     return 'index.php?' + url;
 }
 
-//$(document).ready(function() {
-    $('.eqLogicAttr[data-l1key=configuration][data-l2key=photo]').on('change', function () {
-        if($(this).value() != '' && $('.li_eqLogic.active').attr('data-eqlogic_id') != '') {
-            $('.eqLogic:visible #photo_place,#photo_user').attr("src", DATA_DIR + "/" + $(this).value());
-        }
-    });
-    $('.eqLogicAttr[data-l1key=configuration][data-l2key=type_board]').on('change', function () {
-        if($(this).value() != '' && $('.li_eqLogic.active').attr('data-eqlogic_id') != '') {
-            $('.eqLogic:visible #photo_object').attr("src", "plugins/jElocky/resources/" + $(this).value() + '.png');
-        }
-    });
-//    $('.li_eqLogic.active').attr('data-eqlogic_id') != '') {
-//        
-//    }
-//});
+$('.eqLogicAttr[data-l1key=configuration][data-l2key=photo]').on('change', function () {
+    if($(this).value() != '' && $('.li_eqLogic.active').attr('data-eqlogic_id') != '') {
+        $('.eqLogic:visible #photo_place,#photo_user').attr("src", DATA_DIR + "/" + $(this).value());
+    }
+});
+$('.eqLogicAttr[data-l1key=configuration][data-l2key=type_board]').on('change', function () {
+    if($(this).value() != '' && $('.li_eqLogic.active').attr('data-eqlogic_id') != '') {
+        $('.eqLogic:visible #photo_object').attr("src", "plugins/jElocky/resources/" + $(this).value() + '.png');
+    }
+});
 
 //Override plugin template to rewrite the URL to avoid keeping the successfull save message
 if (getUrlVars('saveSuccessFull') == 1) {
@@ -58,6 +53,23 @@ if (getUrlVars('removeSuccessFull') == 1) {
     $('#div_alert').showAlert({message: '{{Suppression effectuée avec succès}}', level: 'success'});
     history.replaceState(history.state, '', initPluginUrl(['removeSuccessFull']));
 }
+
+$(document).ready(function () {
+    // Override the save event for two reasons:
+    //    - on ctrl+s, avoid running 3 times the save
+    //    - reset immediately modifyWithoutSave to make the automatic relaod of the page work
+    //      when places or objects are added: see below
+    var elem = $('.eqLogicAction[data-action=save]');
+    var oldClick = $._data(elem[0], 'events').click[0].handler;
+    elem.off('click');  
+    elem.click(function(e){
+        // Test to avoid launching 3 times the save on ctrl+s
+        if ($(this).is(':visible')) {
+            modifyWithoutSave = false;
+            oldClick(e);
+        }
+    }); 
+});
 
 function callAjax(_action_id, _eq_id, _async) {
 	$.ajax({
@@ -141,6 +153,9 @@ $('.eqLogic a[data-toggle=tab]').on('click', function () {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/*
+ * Display a popup when places or objects are added, and reload the page
+ */
 $('body').off('jElocky::insert').on('jElocky::insert', function (_event,_options) {
 
     var msg = '{{L\'équipement}} <b>' + _options['eqlogic_name'] + '</b> {{vient d\'être inclu}}';
@@ -159,10 +174,8 @@ $('body').off('jElocky::insert').on('jElocky::insert', function (_event,_options
         });
         // Reload the page after a delay to let the user read the message
         if (refreshTimeout === undefined) {
-            console.log('refresh is sheduled');
             refreshTimeout = setTimeout(function() {
                 refreshTimeout = undefined;
-                console.log('refresh');
                 window.location.reload();
             }, 2000);
         }

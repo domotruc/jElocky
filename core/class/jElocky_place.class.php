@@ -70,7 +70,7 @@ class jElocky_place extends eqLogic {
             
             // Save the place directly: required before creating command
             $place_eql->save(true);
-            
+         	
             // Inform the UI that a place has been added
             event::add('jElocky::insert', array('eqlogic_type' => $place_eql->getEqType_name(), 'eqlogic_name' => $place_eql->getName()));
 
@@ -397,7 +397,7 @@ class jElocky_place extends eqLogic {
                     $object_eql = jElocky_object::getInstance($object, $this->getId());
                     if ($object_eql != null) {
                         $object_eql->updateCommands($object);
-                        if ($does_update_conf) {
+                        if ($does_update_conf && !$this->getIsLocked()) {
                             $object_eql->updateConfiguration($object);
                             $object_eql->save();
                         }
