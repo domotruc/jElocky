@@ -25,30 +25,29 @@ trait jElockyEqLogic {
     private $_to_update = false;
     
     /**
-     * Override setIsEnable to memorize that the eqLogic shall be updated on save when just enabled. See preSave and postSave.
+     * Override setIsEnable to memorize that the eqLogic shall be updated on save when just enabled (except at creation).
+     * See preSave and postSave.
      * @param boolean $isEnable
      * @return boolean
      */
     public function setIsEnable($isEnable) {
-        if (!$this->getIsEnable() && $isEnable)
+        if (isset($this->id) && !$this->getIsEnable() && $isEnable)
             $this->_to_update = true;
             
         return parent::setIsEnable($isEnable);
     }
     
-    
     /**
      * Lock this object. Lock status is memorized in the cache only.
-     * @param bool $isLocked
+     * @param boolean $isLocked
      */
     public function setIsLocked($isLocked) {
         $this->setCache('isLocked', $isLocked);
     }
     
-    
     /**
      * Return whether or not this jElockyEqLogic is locked.
-     * @return bool
+     * @return boolean
      */
     public function getIsLocked() {
         return $this->getCache('isLocked', false);
@@ -58,7 +57,7 @@ trait jElockyEqLogic {
      * Return whether or not the given jElockyEqLogic object is locked.
      * It is an efficient way to retrieve the lock status if only its id is known
      * @param int $id
-     * @return bool
+     * @return boolean
      */
     public static function getIsLockedById($id) {
         $eql = new eqLogic();
