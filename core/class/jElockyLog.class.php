@@ -54,6 +54,16 @@ class jElockyLog {
         self::log(getmypid(), $type, $msg, $logicalId);
     }
     
+    /**
+     * Add an error message and throw an exception
+     * @param string $msg
+     * @throw exception
+     */
+    public static function addException($msg) {
+        self::log(getmypid(), 'error', $msg);
+        throw new Exception($msg);
+    }
+    
     public static function endStep() {
         $pid = getmypid();
 

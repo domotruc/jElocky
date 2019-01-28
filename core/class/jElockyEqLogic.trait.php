@@ -41,17 +41,17 @@ trait jElockyEqLogic {
      * Lock this object. Lock status is memorized in the cache only.
      * @param boolean $isLocked
      */
-    public function setIsLocked($isLocked) {
-        $this->setCache('isLocked', $isLocked);
-    }
+//     public function setIsLocked($isLocked) {
+//         $this->setCache('isLocked', $isLocked);
+//     }
     
     /**
      * Return whether or not this jElockyEqLogic is locked.
      * @return boolean
      */
-    public function getIsLocked() {
-        return $this->getCache('isLocked', false);
-    }
+//     public function getIsLocked() {
+//         return $this->getCache('isLocked', false);
+//     }
     
     /**
      * Return whether or not the given jElockyEqLogic object is locked.
@@ -59,10 +59,10 @@ trait jElockyEqLogic {
      * @param int $id
      * @return boolean
      */
-    public static function getIsLockedById($id) {
-        $eql = new eqLogic();
-        return $eql->setId($id)->getCache('isLocked', false);
-    }
+//     public static function getIsLockedById($id) {
+//         $eql = new eqLogic();
+//         return $eql->setId($id)->getCache('isLocked', false);
+//     }
       
     public function preSave() {
         $this->startLogStep(__METHOD__);
@@ -77,6 +77,16 @@ trait jElockyEqLogic {
             $this->update2();
             $this->_to_update = false;
         }
+        jElockyLog::endStep();
+    }
+
+    /**
+     * Called after place removal
+     * Release jElocky lock
+     */
+    public function postRemove() {
+        $this->startLogStep(__METHOD__);
+        jElocky::releaseLock();
         jElockyLog::endStep();
     }
     

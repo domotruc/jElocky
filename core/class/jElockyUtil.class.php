@@ -22,8 +22,7 @@ require_once __DIR__ . '/jElockyLog.class.php';
 
 class jElockyUtil {
 
-    const DATA_DIR = __DIR__ . '/../../data';
-        
+    const DATA_DIR = __DIR__ . '/../../data';        
     /**
      * @return string data relative directory path (wrt to the jeedom root directory) 
      */
@@ -43,35 +42,5 @@ class jElockyUtil {
             }
         }
         return false;
-    }
-       
-    public static function searchConfiguration($_configuration, $_type = null) {
-        if (!is_array($_configuration)) {
-            $values = array(
-                'configuration' => '%' . $_configuration . '%',
-            );
-            $sql = 'SELECT ' . DB::buildField('eqLogic') . '
-			        FROM eqLogic
-			        WHERE configuration LIKE :configuration';
-        }
-        else {
-            $values = array(
-                'configuration' => '%' . $_configuration[0] . '%',
-            );
-            $sql = 'SELECT ' . DB::buildField('eqLogic') . '
-			        FROM eqLogic
-			        WHERE (configuration LIKE :configuration';
-            for ($i = 1; $i < count($_configuration); $i++) {
-                $values['configuration' . $i] = '%' . $_configuration[$i] . '%';
-                $sql .= ' OR configuration LIKE :configuration' . $i;
-            }
-            $sql = $sql . ')';
-        }
-        if ($_type !== null) {
-            $values['eqType_name'] = $_type;
-            $sql .= ' AND eqType_name=:eqType_name ';
-        }
-        $sql .= ' ORDER BY name';
-        return eqLogic::cast(DB::Prepare($sql, $values, DB::FETCH_TYPE_ALL, PDO::FETCH_CLASS, eqLogic::class));
     }
 }

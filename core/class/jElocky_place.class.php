@@ -93,59 +93,59 @@ class jElocky_place extends eqLogic {
      */
     public function update1($to_save=true) {
         $this->startLogStep(__METHOD__);
-        if ($this->getIsEnable() && !$this->getIsLocked()) {
+        if ($this->getIsEnable()) {
+            jElocky::pickLock();
             $this->requestPlaceAndUpdate(true, $to_save);
+            jElocky::releaseLock();            
         }
         jElockyLog::endStep();
     }
     
     /**
-     * Update this place information
+     * Update this place related information (objects, photo)
      * @throws \Exception in case of connexion error with the Elocky server
      */
     public function update2() {
         $this->startLogStep(__METHOD__);
-        if ($this->getIsEnable() && !$this->getIsLocked()) {
+        if ($this->getIsEnable()) {
+            jElocky::pickLock();
             $this->requestObjectsAndUpdate(true);
+            $this->updatePhoto('requestPlacePhoto');
+            jElocky::releaseLock();            
         }
         jElockyLog::endStep();
     }
     
-    public function postSave() {
-        $this->startLogStep(__METHOD__);
-        $this->updatePhoto('requestPlacePhoto');
-        jElockyLog::endStep();
-    }
-
     /**
-     * Called on place removal
+     * Called before place removal
+     * Pick jElocky lock
      * Removes attached objects
      */
     public function preRemove() {
         $this->startLogStep(__METHOD__);
-        $this->setIsLocked(true);
+        jElocky::pickLock();
         jElockyLog::add('info', 'suppression lieu ' . $this->getName() . ' (id=' . $this->getId() . ')');
         $objects = $this->getObjects();
         foreach ($objects as $object) {
             $object->remove();
-        }
+        }          
         jElockyLog::endStep();
     }
-
+    
     /**
      * Update data that shall be updated frequently
      * (only commands are updated)
      */
     public static function cronHighFreq() {
         jElockyLog::startStep(__METHOD__);
+        jElocky::pickLock();
         foreach (self::byType(__CLASS__, true) as $place_eql) {
-            if ($place_eql->getIsEnable() && ! $place_eql->getIsLocked())
+            if ($place_eql->getIsEnable()) {
                 $place_eql->requestPlaceAndUpdate(false);
-            
-            // Test done each time in case the place is disabled in between
-            if ($place_eql->getIsEnable() && ! $place_eql->getIsLocked())
                 $place_eql->requestObjectsAndUpdate(false);
+            }
         }
+        jElocky::releaseLock();
         jElockyLog::endStep();
     }
     
@@ -156,7 +156,7 @@ class jElocky_place extends eqLogic {
      * @param array $place object data array retrieved from the Elocky server
      */
     public function updateConfiguration($place) {
-        if ($this->getIsEnable() && !$this->getIsLocked()) {
+        if ($this->getIsEnable()) {
             $this->setMultipleConfiguration(array('address', 'zip_code', 'city', 'photo', 'country'), $place);
         }
     }
@@ -166,7 +166,7 @@ class jElocky_place extends eqLogic {
      * @param array $place object data array retrieved from the Elocky server
      */
     public function updateCommands($place) {
-        if ($this->getIsEnable()&& !$this->getIsLocked()) {
+        if ($this->getIsEnable()) {
             $this->setCmdData(self::$_cmds_def_matrix, $place);
         }
     }
@@ -234,7 +234,7 @@ class jElocky_place extends eqLogic {
     }
 
     /**
-     * Get an enable user (enable and not locked) for this place
+     * Get an enable user for this place
      * A warning is logged if no user is found
      * @return jElocky_user|null
      */
@@ -243,7 +243,7 @@ class jElocky_place extends eqLogic {
         foreach ($users as $u) {
             /* @var jElocky_user $eqU */
             $eqU = eqLogic::byId($u['ref']);
-            if (is_object($eqU) && $eqU->getIsEnable() && !$eqU->getIsLocked()) {
+            if (is_object($eqU) && $eqU->getIsEnable()) {
                 return $eqU;
             }
         }
@@ -261,7 +261,7 @@ class jElocky_place extends eqLogic {
         if (($admin_id = $this->getConfiguration('admin', '')) != '') {
             /* @var jElocky_user $eqU */
             $eqU = eqLogic::byId($admin_id);
-            if (is_object($eqU) && $eqU->getIsEnable() && !$eqU->getIsLocked()) {
+            if (is_object($eqU) && $eqU->getIsEnable()) {
                 return $eqU;
             }
         }
@@ -365,7 +365,7 @@ class jElocky_place extends eqLogic {
                 if ($place != null) {
                     if ($does_update_conf) {
                         $this->updateConfiguration($place);
-                        if ($to_save && !$this->getIsLocked())
+                        if ($to_save)
                             $this->save();
                     }
                     $this->updateCommands(self::$_cmds_def_matrix, $place);
@@ -394,10 +394,11 @@ class jElocky_place extends eqLogic {
             if (($objects = $this->requestObjects()) !== null) {
                 foreach ($objects as $object) {
                     jElockyLog::add('debug', 'treating object ' . $object['name']);
-                    $object_eql = jElocky_object::getInstance($object, $this->getId());
+                    $object_eql = jElocky_object::getInstance($object);
                     if ($object_eql != null) {
                         $object_eql->updateCommands($object);
-                        if ($does_update_conf && !$this->getIsLocked()) {
+                        $is_updated = $object_eql->setPlace($this->getId());
+                        if ($is_updated || $does_update_conf) {
                             $object_eql->updateConfiguration($object);
                             $object_eql->save();
                         }

@@ -26,7 +26,6 @@ require_once 'jElockyEqLogic.trait.php';
 
 /**
  * @author domotruc
- *
  */
 class jElocky_object extends eqLogic {
     
@@ -76,12 +75,10 @@ class jElocky_object extends eqLogic {
     /**
      * Create a new object belonging to the given place or return it if already existing.
      * If created, the object is saved.
-     * If the given place is locked, null is return
      * @param array $object object data as returned by https://elocky.com/fr/doc-api-test#liste-objets
-     * @param array $place_id jeedom id of the place where is located the object
      * @return jElocky_object|null return null if 
      */
-    public static function getInstance($object, $place_id) {
+    public static function getInstance($object) {
         
         /* @var jElocky_object $object_eql*/
         $object_eql = self::byLogicalId($object[self::KEY_OBJECT_ID], self::class);
@@ -89,7 +86,6 @@ class jElocky_object extends eqLogic {
         // Object creation if necessary
         if (is_object($object_eql)) {
             jElockyLog::add('debug', 'object ' . $object_eql->getName() . ' exists (id=' . $object_eql->getId() . ')');
-            $is_created = false;
         }
         else {
             $type = self::TYPES[$object[self::KEY_TYPE_BOARD]];
@@ -99,20 +95,13 @@ class jElocky_object extends eqLogic {
             $object_eql->setLogicalId($object[self::KEY_OBJECT_ID]);
             $object_eql->setIsEnable(1);
             $object_eql->setConfiguration(self::KEY_TYPE_BOARD, $type);
-            $object_eql->setConfiguration('place_id', $place_id);
 
             if ($type == self::TYP_SERRURE) {
                 $object_eql->setConfiguration('battery_type', '1x3.6V ER14250');
             }
             
             jElockyLog::add('info', 'creation object ' . $object_eql->getName() . ' de type ' . $type);
-            $is_created = true;
-        }
-
-        if (jElocky_place::getIsLockedById($place_id))
-            return null;
-
-        if ($is_created) {
+        
             // Save the created object
             $object_eql->save(true);
             
@@ -132,16 +121,19 @@ class jElocky_object extends eqLogic {
         $this->startLogStep(__METHOD__);
         
         if ($this->getIsEnable()) {
+            jElocky::pickLock();
             /* @var jElocky_place $place_eql*/
             $place_eql = jElocky_place::byId($this->getConfiguration('place_id'));
-            if (($object = $place_eql->requestObjects($this->getLogicalId())) != null) {
+            if (is_object($place_eql) && ($object = $place_eql->requestObjects($this->getLogicalId())) != null) {
                 $this->updateConfiguration($object);
                 $this->updateCommands($object);
                 if ($to_save)
                     $this->save(true);
-            }
-            else
+            }     
+            else {
                 jElockyLog::add('warning', "aucun lieu actif trouvé pour mettre à jour l'objet " . $this->getName());
+            }
+            jElocky::releaseLock();
         }
         
         jElockyLog::endStep();
@@ -151,15 +143,33 @@ class jElocky_object extends eqLogic {
     public function update2() {}
         
     /**
-     * Called on object removal
+     * Called before object removal
+     * Pick jElocky lock. Release is done in postRemove.
      * Log a message
      */
     public function preRemove() {
         $this->startLogStep(__METHOD__);
+        jElocky::pickLock();
         jElockyLog::add('info', 'suppression objet ' . $this->getName() . ' (id=' . $this->getId() . ')');
         jElockyLog::endStep();
     }
-       
+    
+    /**
+     * Set the place of this object.
+     * It is the responsability of the caller to save this object.
+     * @param array $place_id jeedom id of the place where is located the object
+     * @return boolean true if the place was changed
+     */
+    public function setPlace($place_id) {
+        $place = $this->getConfiguration('place_id');
+        if ($place != $place_id) {
+            $this->setConfiguration('place_id', $place_id);
+            jElockyLog::add('debug', "l'objet " . $this->getName() . " est ajouté à la place " . $place_id);
+            return true;
+        }
+        return false;
+    }
+    
     /**
      * Return the photo pathname of this jElocky_object
      * @return string full filename on the jeedom server

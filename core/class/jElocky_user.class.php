@@ -50,15 +50,19 @@ class jElocky_user extends eqLogic implements LoggerInterface {
         $this->startLogStep(__METHOD__);
         if (($api = $this->getAPI()) != null) {
             try {
+                jElocky::pickLock();
                 $userProfile = $api->requestUserProfile();
                 $this->setMultipleConfiguration(array('first_name','last_name','phone','created','photo'),
                     $userProfile);
                 $this->setLogicalId($userProfile['reference']);
                 $this->updateAPI();
-                if ($to_save && !$this->getIsLocked())
+                if ($to_save)
                     $this->save();
             } catch (\Exception $e) {
                 $this->processElockyException($e->getMessage(), true);
+            }
+            finally {
+                jElocky::releaseLock();
             }
         }
         jElockyLog::endStep();
@@ -72,20 +76,18 @@ class jElocky_user extends eqLogic implements LoggerInterface {
      */
     public function update2() {
         $this->startLogStep(__METHOD__);
-        if ($this->getIsEnable() && !$this->getIsLocked()) {
+        if ($this->getIsEnable()) {
             try {
+                jElocky::pickLock();
                 foreach ($this->requestPlaces() as $place) {
                     jElockyLog::add('debug', 'treating place ' . $place['admin_address'][0]['name']);
                     $place_eql = jElocky_place::getInstance($place);
                     $place_eql->addUser($this->getId(), $place['admin_address'][0]['state'],
                         $place['admin_address'][0]['name']);
                     $place_eql->updateConfiguration($place);
+                    $place_eql->save(true);
                     $place_eql->updateCommands($place);
-                    $place_eql->requestObjectsAndUpdate(true);
-                    if (!$this->getIsLocked() && !$place_eql->getIsLocked())
-                        $place_eql->save();
-                    else
-                        jElockyLog::add('debug', 'user or place is locked: place ' . $place['admin_address'][0]['name'] . ' is not saved');
+                    $place_eql->update2();
                 }
                 
                 // Update the user photo if needed
@@ -94,18 +96,22 @@ class jElocky_user extends eqLogic implements LoggerInterface {
             catch (Exception $e) {
                 $this->processElockyException($e->getMessage(), true);
             }
+            finally {
+                jElocky::releaseLock();
+            }
         }
         jElockyLog::endStep();
     }
     
     /**
-     * Called on user removal
+     * Called before user removal
+     * Pick jElocky lock
      * Remove the user from its related places.
      * Remove places without any user
      */
     public function preRemove() {
         $this->startLogStep(__METHOD__);
-        $this->setIsLocked(true);
+        jElocky::pickLock();
         jElockyLog::add('info', 'suppression utilisateur ' . $this->getName() . ' (id=' . $this->getId() . ')');
         $places = $this->getPlaces();
         foreach ($places as $place) {
@@ -148,7 +154,7 @@ class jElocky_user extends eqLogic implements LoggerInterface {
      * @return null|UserAPI null if this user is not enabled
      */
     public function getAPI() {
-        if (! $this->getIsEnable() || $this->getIsLocked())
+        if (! $this->getIsEnable())
             return null;
         
         if (isset($this->_api))
