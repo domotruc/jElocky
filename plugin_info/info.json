@@ -9,7 +9,7 @@
 	"hasDependency" : false,
 	"hasOwnDeamon" : false,
 	"maxDependancyInstallTime" : 0,
-	"changelog" : "https://domotruc.github.io/jElocky/#language#/changelog",
+	"changelog" : "https://domotruc.github.io/jElocky/#language#/index.html#changelog",
 	"documentation" : "https://domotruc.github.io/jElocky/#language#/",
 	"link" : {
 		"forum":"https://www.jeedom.com/forum/viewtopic.php?f=134&t=38672&hilit=jelocky"
