@@ -99,7 +99,7 @@ class jElocky extends eqLogic {
         jElockyLog::startStep(__METHOD__);
         
         // Note: perform a full update at user level (which update also places and objects)
-        //jElocky_user::update_all();
+        jElocky_user::update_all();
         
         jElockyLog::endStep();
     }
