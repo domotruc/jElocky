@@ -55,7 +55,6 @@ class jElocky_user extends eqLogic implements LoggerInterface {
                 $this->setMultipleConfiguration(array('first_name','last_name','phone','created','photo'),
                     $userProfile);
                 $this->setLogicalId($userProfile['reference']);
-                $this->updateAPI();
                 if ($to_save)
                     $this->save();
             } catch (\Exception $e) {
@@ -167,6 +166,7 @@ class jElocky_user extends eqLogic implements LoggerInterface {
         $auth_data = $this->getConfiguration('auth_data', NULL);
 
         $this->_api = new UserAPI($id, $secret, $username, $password, $this);
+        $this->_api->setUpdateTokenFunc(array($this, 'updateTokenFunc'));
         
         if (isset($auth_data)) {
             $this->_api->setAuthenticationData(json_decode($auth_data, TRUE));
@@ -200,8 +200,14 @@ class jElocky_user extends eqLogic implements LoggerInterface {
         return null;
     }
 
-    private function updateAPI() {
+    /**
+     * Get authentication date from trhe API and save this object.
+     * Intended to be passed as callback to the Elocky API.
+     */
+    public function updateTokenFunc() {
+        jElockyLog::add('info', "sauvegarde le nouveau jeton d'authentification");
         $this->setConfiguration('auth_data', json_encode($this->getAPI()->getAuthenticationData()));
+        $this->save(true);
     }
 }
 

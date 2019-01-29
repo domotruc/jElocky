@@ -6,19 +6,19 @@
         "source": {
             "type": "git",
             "url": "https://github.com/domotruc/elocky-api.git",
-            "reference": "81b3cf7583a6d278c9dd43a2ed711109c3e222fe"
+            "reference": "1cef4cccdee7bfe9c145b0672769390a86b9c0ef"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/domotruc/elocky-api/zipball/81b3cf7583a6d278c9dd43a2ed711109c3e222fe",
-            "reference": "81b3cf7583a6d278c9dd43a2ed711109c3e222fe",
+            "url": "https://api.github.com/repos/domotruc/elocky-api/zipball/1cef4cccdee7bfe9c145b0672769390a86b9c0ef",
+            "reference": "1cef4cccdee7bfe9c145b0672769390a86b9c0ef",
             "shasum": ""
         },
         "require": {
             "php": ">=5.4.0",
             "psr/log": "^1.0.0"
         },
-        "time": "2019-01-03T07:46:43+00:00",
+        "time": "2019-01-29T05:37:17+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
