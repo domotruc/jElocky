@@ -76,7 +76,7 @@ class jElocky extends eqLogic {
         throw new Exception('API::' . __("action non définie ou inconnue", __FILE__));
     }
     
-    /*
+    /**
      * Fonction exécutée automatiquement toutes les minutes par Jeedom
      */
     public static function cron() {
@@ -92,14 +92,14 @@ class jElocky extends eqLogic {
         jElockyLog::endStep();
     }
 
-    /*
+    /**
      * Fonction exécutée automatiquement toutes heures par Jeedom
      */
     public static function cronHourly() {
         jElockyLog::startStep(__METHOD__);
         
         // Note: perform a full update at user level (which update also places and objects)
-        jElocky_user::update_all();
+        //jElocky_user::update_all();
         
         jElockyLog::endStep();
     }

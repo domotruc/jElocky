@@ -97,7 +97,7 @@ class jElockyLog {
         if (self::getLogLevel() == 'debug')        
             log::add(self::LOG_FILE, $type, $keyPrefix . sprintf('%5d', $key) . '|' . $msgPrefix . $msg, $logicalId);
         else
-            log::add(self::LOG_FILE, $type, $keyPrefix . $msgPrefix . $msg, $logicalId);
+            log::add(self::LOG_FILE, $type, $msg, $logicalId);
     }
     
     private static function getLogLevel() {
