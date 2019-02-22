@@ -368,7 +368,7 @@ class jElocky_place extends eqLogic {
                         if ($to_save)
                             $this->save();
                     }
-                    $this->updateCommands(self::$_cmds_def_matrix, $place);
+                    $this->updateCommands($place);
                 }
                 else {
                     jElockyLog::add('warning',

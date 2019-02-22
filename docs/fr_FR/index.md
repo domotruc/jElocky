@@ -4,9 +4,9 @@ Présentation
 Le plugin **jElocky** interface les équipements de la marque [Elocky](https://elocky.com/) (serrure eVy, box eZy, beacon) avec Jeedom.
 Il implémente l'[API mise à disposition par Elocky](https://elocky.com/fr/doc-api-test).
 
-Les fonctionalités disponibles sont:
+Les fonctionnalités disponibles sont:
 * Intégration dans Jeedom des utilisateurs, lieux et objets tels que définis dans l'appli Elocky;
-* Integration des données associées, via des commandes information, afin de permettre leur utilisation dans l'eco-système Jeedom (scénario, ...);
+* Intégration des données associées, via des commandes information, afin de permettre leur utilisation dans l'eco-système Jeedom (scénario, ...);
 * Fourniture d'une API pour récupérer, via IFTTT, l'information de déclenchement de l'alarme d'un lieu;
 * Synchronisation périodique des données avec le serveur Elocky. 
 
@@ -221,6 +221,11 @@ En cas d'erreur `{"error":"json_error","error_description":"Syntax error"}`: vé
 
 Registre des évolutions
 ===
+
+#### 22/02/2019 (beta)
+
+Correction [#2](https://github.com/domotruc/jElocky/issues/2): status armement alarme non récupéré
+
 
 #### 31/01/2019 (beta)
 
