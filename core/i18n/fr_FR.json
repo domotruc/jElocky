@@ -1,7 +1,5 @@
 {
     "plugins\/jElocky\/plugin_info\/configuration.php": {
-        "Global param 1": "Global param 1",
-        "Global param 2": "Global param 2",
         "Client ID": "Client ID",
         "Client secret": "Client secret"
     },
@@ -48,13 +46,11 @@
         "Configuration avancée": "Configuration avancée",
         "Equipement": "Equipement",
         "Commandes": "Commandes",
-        "Nom de l'équipement template": "Nom de l'équipement template",
         "Objet parent": "Objet parent",
         "Aucun": "Aucun",
         "Catégorie": "Catégorie",
         "Activer": "Activer",
         "Visible": "Visible",
-        "template param 1": "template param 1",
         "Nom": "Nom",
         "Type": "Type",
         "Action": "Action",
